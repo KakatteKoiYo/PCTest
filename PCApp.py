@@ -152,6 +152,7 @@ def iniciar(idVar):
     palabraPrincipalLabel = tk.Label(paginaTest, text = objetosArray[randomPregunta][0], bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 40))
     palabraPrincipalLabel.pack(pady = 90)
 
+
     lugarRespuesta = random.randint(0, 4)
     for i in range(5):
         while True:
