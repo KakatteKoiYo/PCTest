@@ -139,22 +139,20 @@ Se recomienda crear la lista con más de 10 objetos.
 
 
 def iniciar(idVar):
-    print(objetosTabla(obtenerTabla(idVar)))
+    objetosArray = objetosTabla(obtenerTabla(idVar))
     global paginaTest
+    opciones = []
     paginaInicio.pack_forget()
     paginaTest = tk.Frame(window, bg = colorFondoTest)
     paginaTest.pack(expand = True, fill = "both")
 
     palabraPrincipalLabel = tk.Label(paginaTest, text = "Amount", bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 40))
     palabraPrincipalLabel.pack(pady = 90)
+    for i in range(5):
+        numeroRandom = random.randint(0, len(objetosArray))
+        opciones.append(objetosArray[numeroRandom][1])
 
-    opciones = [
-        "De confianza",
-        "Vago",
-        "Monto",
-        "Activos/Bienes",
-        "Detenido"
-    ]
+    
     anchoBotonArr = []
 
     for i in opciones:
