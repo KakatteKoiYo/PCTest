@@ -142,14 +142,20 @@ def iniciar(idVar):
     objetosArray = objetosTabla(obtenerTabla(idVar))
     global paginaTest
     opciones = []
+    numerosGenerados = []
     paginaInicio.pack_forget()
     paginaTest = tk.Frame(window, bg = colorFondoTest)
     paginaTest.pack(expand = True, fill = "both")
 
-    palabraPrincipalLabel = tk.Label(paginaTest, text = "Amount", bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 40))
+    palabraPrincipalLabel = tk.Label(paginaTest, text = objetosArray[random.randint(0, len(objetosArray)-1)][0], bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 40))
     palabraPrincipalLabel.pack(pady = 90)
     for i in range(5):
-        numeroRandom = random.randint(0, len(objetosArray))
+        while True:
+            numeroRandom = random.randint(0, len(objetosArray)-1)
+            print(numeroRandom)
+            if numeroRandom not in numerosGenerados:
+                numerosGenerados.append(numeroRandom)
+                break
         opciones.append(objetosArray[numeroRandom][1])
 
     
