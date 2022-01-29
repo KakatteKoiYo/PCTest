@@ -147,16 +147,24 @@ def iniciar(idVar):
     paginaTest = tk.Frame(window, bg = colorFondoTest)
     paginaTest.pack(expand = True, fill = "both")
 
-    palabraPrincipalLabel = tk.Label(paginaTest, text = objetosArray[random.randint(0, len(objetosArray)-1)][0], bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 40))
+    randomPregunta = random.randint(0, len(objetosArray)-1)
+
+    palabraPrincipalLabel = tk.Label(paginaTest, text = objetosArray[randomPregunta][0], bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 40))
     palabraPrincipalLabel.pack(pady = 90)
+
+    lugarRespuesta = random.randint(0, 4)
     for i in range(5):
         while True:
+
             numeroRandom = random.randint(0, len(objetosArray)-1)
             print(numeroRandom)
-            if numeroRandom not in numerosGenerados:
+            if numeroRandom not in numerosGenerados or numeroRandom != randomPregunta:
                 numerosGenerados.append(numeroRandom)
                 break
-        opciones.append(objetosArray[numeroRandom][1])
+        if i == lugarRespuesta:
+            opciones.append(objetosArray[randomPregunta][1])
+        else:
+            opciones.append(objetosArray[numeroRandom][1])
 
     
     anchoBotonArr = []
