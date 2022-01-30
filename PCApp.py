@@ -1,7 +1,7 @@
 import tkinter as tk 
 import sqlite3 as db
 import os.path as fs
-import random
+import random, time
 
 
 window = tk.Tk()
@@ -25,7 +25,7 @@ def conexionBaseDatos():
         cursor = con.cursor()
         cursor.execute("CREATE TABLE meses(id integer PRIMARY KEY, palabra1 text, palabra2 text, descripcion text)")
         cursor.execute("CREATE TABLE nombreslista(id integer PRIMARY KEY, nombre text, tabla text)")
-        cursor.execute("INSERT INTO nombreslista (nombre, tabla) VALUES('Meses en Inglés', 'meses')")
+        cursor.execute("INSERT INTO nombreslista (nombre, tabla) VALUES('Meses en Inglés (ejemplo)', 'meses')")
         cursor.execute("INSERT INTO meses (palabra1, palabra2, descripcion) VALUES('January', 'Enero', 'Primer mes')")
         cursor.execute("INSERT INTO meses (palabra1, palabra2, descripcion) VALUES('February', 'Febrero', 'Segundo mes')")
         cursor.execute("INSERT INTO meses (palabra1, palabra2, descripcion) VALUES('March', 'Marzo', 'Tercer mes')")
@@ -135,62 +135,133 @@ Se recomienda crear la lista con más de 10 objetos.
         campoCargado.insert(tk.END, nombreArray[lista.curselection()[0]])
         campoCargado.config(state = "disabled")
 
-        iniciarBoton.config(state = "normal", command = lambda x = idVar: iniciar(x))
+        iniciarBoton.config(state = "normal", command = lambda x = idVar: iniciarPag(x))
 
 
-def iniciar(idVar):
+def iniciarPag(idVar, numPreguntas = 10):
+
+    global paginaTest, contador, resultadoLista #numPreguntasGlobal
+    #numPreguntasGlobal = numPreguntas
     objetosArray = objetosTabla(obtenerTabla(idVar))
-    global paginaTest
-    opciones = []
-    numerosGenerados = []
+    resultadoLista = ""
+
     paginaInicio.pack_forget()
+    #destruirInicio()
     paginaTest = tk.Frame(window, bg = colorFondoTest)
     paginaTest.pack(expand = True, fill = "both")
 
-    randomPregunta = random.randint(0, len(objetosArray)-1)
+    contador = 0
+    # botontest = tk.Button(paginaTest, text = "press", command = lambda : iniciarTest())
+    # botontest.place(x = 0,y = 30)
+    resultadosLabel = tk.Label(paginaTest, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 10), justify = "left")
+    resultadosLabel.place(x= 20, y = 10)
 
-    palabraPrincipalLabel = tk.Label(paginaTest, text = objetosArray[randomPregunta][0], bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 40))
-    palabraPrincipalLabel.pack(pady = 90)
+    avanceLabel = tk.Label(paginaTest, text = "{}/{}".format(contador,numPreguntas), bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 20))
+    avanceLabel.place(x = 800, y = 100)
+    def iniciarTest(respuesta = 0):
+        global contador
 
-
-    lugarRespuesta = random.randint(0, 4)
-    for i in range(5):
-        while True:
-
-            numeroRandom = random.randint(0, len(objetosArray)-1)
-            print(numeroRandom)
-            if numeroRandom not in numerosGenerados or numeroRandom != randomPregunta:
-                numerosGenerados.append(numeroRandom)
-                break
-        if i == lugarRespuesta:
-            opciones.append(objetosArray[randomPregunta][1])
-        else:
-            opciones.append(objetosArray[numeroRandom][1])
-
-    
-    anchoBotonArr = []
-
-    for i in opciones:
-        anchoBotonArr.append(len(i))
-
-    anchoBotonArr.sort()
-    anchoBoton = anchoBotonArr[-1] + 2
-
-    for i in range(len(opciones)):
+        if contador == numPreguntas:
+            regresar()
 
         
+        opciones = []
+        numerosGenerados = []
+
+        testInterfazFrame = tk.Frame(paginaTest, bg = colorFondoTest)
+        testInterfazFrame.pack()
+        randomPregunta = random.randint(0, len(objetosArray)-1)
+
+        palabraPrincipal = objetosArray[randomPregunta][0]
+
+        palabraPrincipalLabel = tk.Label(testInterfazFrame, text = palabraPrincipal, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 40))
+        palabraPrincipalLabel.pack(pady = 90)
+
+        contador += 1
+        print(contador)
+        lugarRespuesta = random.randint(0, 4)
+        for i in range(5):
+            while True:
+
+                numeroRandom = random.randint(0, len(objetosArray)-1)
+                #print(numeroRandom)
+                if numeroRandom not in numerosGenerados and numeroRandom != randomPregunta:
+                    numerosGenerados.append(numeroRandom)
+                    break
+            if i == lugarRespuesta:
+                opciones.append(objetosArray[randomPregunta][1])
+            else:
+                opciones.append(objetosArray[numeroRandom][1])
+
+        numerosGenerados = []
+
+        anchoBotonArr = []
+
+        for i in opciones:
+            anchoBotonArr.append(len(i))
+
+        anchoBotonArr.sort()
+        anchoBoton = anchoBotonArr[-1] + 2
 
 
-        opcionBoton = tk.Button(paginaTest, text = opciones[i], width = anchoBoton, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 25))
-        opcionBoton.pack(pady = 10)
+        opcionBoton1 = tk.Button(testInterfazFrame, text = opciones[0], width = anchoBoton, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 25), 
+        command = lambda : verificarRespuesta(0))
+        opcionBoton1.pack(pady = 10)
 
+        opcionBoton2 = tk.Button(testInterfazFrame, text = opciones[1], width = anchoBoton, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 25), 
+        command = lambda : verificarRespuesta(1))
+        opcionBoton2.pack(pady = 10)
+        opcionBoton3 = tk.Button(testInterfazFrame, text = opciones[2], width = anchoBoton, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 25), 
+        command = lambda : verificarRespuesta(2))
+        opcionBoton3.pack(pady = 10)
+        opcionBoton4 = tk.Button(testInterfazFrame, text = opciones[3], width = anchoBoton, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 25), 
+        command = lambda : verificarRespuesta(3))
+        opcionBoton4.pack(pady = 10)
+        opcionBoton5 = tk.Button(testInterfazFrame, text = opciones[4], width = anchoBoton, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 25), 
+        command = lambda : verificarRespuesta(4))
+        opcionBoton5.pack(pady = 10)
+
+        def verificarRespuesta(x):
+            global resultadoLista       
+            try: 
+                avanceLabel.config(text = "{}/{}".format(contador, numPreguntas))
+                list = testInterfazFrame.winfo_children()
+                for l in list:
+                    l.destroy()
+                testInterfazFrame.destroy()
+                iniciarTest()
+                if x == lugarRespuesta:
+                    resultadoLista = resultadoLista + "O {0} = {1} \n".format(palabraPrincipal, opciones[x])
+                    resultadosLabel.config(text= resultadoLista)
+                else:
+                    resultadoLista = resultadoLista + "X {0} = {1} -> O {2} = {3} \n".format(palabraPrincipal, opciones[x], palabraPrincipal, opciones[lugarRespuesta])
+                    resultadosLabel.config(text= resultadoLista)
+            except Exception as e: 
+                print(e)
+    # def verificarRespuesta():
+
+    iniciarTest()
 
 def regresar():
-    paginaInicio.pack()
     paginaTest.pack_forget()
+    paginaInicio.pack(fill = "both", expand = True)
+    # destruirTestInicio()
+    # pantallaInicio()
 
 def mostrar():
     print(lista.curselection())
+
+def destruirInicio():
+    list = paginaInicio.winfo_children()
+    for l in list:
+        l.destroy()
+    paginaInicio.destroy()
+def destruirTestInicio():
+    list = paginaTest.winfo_children()
+    for l in list:
+        l.destroy()
+    paginaTest.destroy()
+
 conexionBaseDatos()
 pantallaInicio()
 window.mainloop()
