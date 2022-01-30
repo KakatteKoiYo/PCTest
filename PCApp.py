@@ -63,8 +63,21 @@ def objetosTabla(tabla):
     objetos = cursor.fetchall()
     return objetos
 
+def generarLista():
+    listaCompleta = campoDatos.get("1.0",tk.END)
+    listaArray = []
+    try:
+        listaDividida = listaCompleta.split("\n")
+        for i in listaDividida:
+            if i != "" and "=" in i and len(i.split("=")) == 2:
+                listaArray.append(i.split("="))
+
+        print(listaArray)
+    except Exception as e:
+        print(e)
+
 def pantallaInicio():
-    global paginaInicio, lista
+    global paginaInicio, lista, campoDatos
 
     idArray = []
     nombreArray = []
@@ -90,7 +103,12 @@ IV = Cuatro
 1001 = 9
 
 Todo lo que haya del lado izquierdo del signo de igualdad es
-considerado lo principal y lo del lado derecho el significado.
+considerado texto principal y lo del lado derecho el significado.
+
+Recuerda, sólo debe haber un signo de igualdad (=) por linea,
+cualquier linea que no cumpla con texto1 = texto2 será ignorada.
+El texto de cualquier lado puede llevar espacios o signos 
+que sean diferentes al signo de igualdad (=).
 
 Se recomienda crear la lista con más de 10 objetos. 
 """)
@@ -99,7 +117,7 @@ Se recomienda crear la lista con más de 10 objetos.
 
     cargarFrame = tk.Frame(paginaInicio)
     cargarFrame.pack(fill = "x")
-    botonCrear = tk.Button(cargarFrame, text = "Crear lista", width = 58 , font = ("Arial ", 15))
+    botonCrear = tk.Button(cargarFrame, text = "Crear lista", width = 58 , font = ("Arial ", 15), command = generarLista)
     botonCrear.pack(side = tk.LEFT )
 
     listaLabel = tk.Label(paginaInicio, text = "Seleccionar lista", font = ("Arial ", 20))
@@ -173,8 +191,8 @@ def iniciarPag(idVar, numPreguntas = 10):
         randomPregunta = random.randint(0, len(objetosArray)-1)
 
         palabraPrincipal = objetosArray[randomPregunta][0]
-
-        palabraPrincipalLabel = tk.Label(testInterfazFrame, text = palabraPrincipal, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 40))
+        palabraPrincipalAncho = len(palabraPrincipal)
+        palabraPrincipalLabel = tk.Label(testInterfazFrame, text = palabraPrincipal, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 40), width = palabraPrincipalAncho)
         palabraPrincipalLabel.pack(pady = 90)
 
         contador += 1
@@ -262,6 +280,6 @@ def destruirTestInicio():
         l.destroy()
     paginaTest.destroy()
 
-conexionBaseDatos()
+#conexionBaseDatos()
 pantallaInicio()
 window.mainloop()
