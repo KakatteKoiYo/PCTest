@@ -67,36 +67,45 @@ def obtenerTabla(idVar):
     cursor = con.cursor()
     cursor.execute("SELECT tabla FROM nombreslista WHERE id = ?", [idVar])
     tabla = cursor.fetchall()
+    con.close()
     return tabla[0][0]
 
 def obtenerUltimaTabla():
     con = db.connect("perfil.db")
     cursor = con.cursor()
-    cursor.execute("CREATE TABLE tabla1(id integer PRIMARY KEY, palabra1 text, palabra2 text, descripcion text)")
+    cursor.execute("SELECT tabla FROM nombreslista ORDER BY tabla DESC LIMIT 1;")
+    ultimaTabla = cursor.fetchall()
+    con.close()
+    return ultimaTabla[0][0]
 
 def objetosTabla(tabla):
     con = db.connect("perfil.db")
     cursor = con.cursor()
     cursor.execute("SELECT palabra1, palabra2 FROM {}".format(tabla))
     objetos = cursor.fetchall()
+    con.close()
     return objetos
 
 def generarLista():
     listaCompleta = campoDatos.get("1.0",tk.END)
     listaArray = []
     try:
-        listaDividida = listaCompleta.split("\n")
+        listaDividida = [x for x in listaCompleta.split("\n") if x]
+        listaCompleta = len(listaDividida)
+        print(listaCompleta)
         for i in listaDividida:
             if i != "" and "=" in i and len(i.split("=")) == 2:
                 listaArray.append(i.split("="))
 
-        print(listaArray)
+        print(len(listaArray))
+        formNuevaLista()
+        
     except Exception as e:
         print(e)
 
 def pantallaInicio():
-    global paginaInicio, lista, campoDatos
-
+    global paginaInicio, lista, campoDatos, campoEjemplo, camposFrame
+    
     idArray = []
     nombreArray = []
     paginaInicio = tk.Frame(window)
@@ -173,7 +182,7 @@ Se recomienda crear la lista con más de 10 objetos.
 
 
 def iniciarPag(idVar, numPreguntas = 10):
-
+    print(obtenerUltimaTabla())
     global paginaTest, contador, resultadoLista #numPreguntasGlobal
     #numPreguntasGlobal = numPreguntas
     objetosArray = objetosTabla(obtenerTabla(idVar))
@@ -275,6 +284,42 @@ def iniciarPag(idVar, numPreguntas = 10):
     # def verificarRespuesta():
 
     iniciarTest()
+
+def formNuevaLista():
+    # campoEjemplo.destroy()
+    # campoEjemplo.destroy()
+    # formFrame = tk.Frame(camposFrame, width = 80)
+    # formFrame.pack(side = tk.LEFT, fill = "both", expand = True)
+    # nombreLista = tk.Entry(formFrame)
+    # nombreLista.grid(column = 0, row =0 )
+    # global ventanaConfirmacionwindow.bind("<Motion>", movertop)
+
+    x = window.winfo_rootx()
+    y = window.winfo_rooty()
+    ventanaConfirmacion = tk.Toplevel(window, bg = "cyan")
+    ventanaConfirmacion.geometry("%dx%d+%d+%d" % (500, 150, x + 400 , y + 100))
+    ventanaConfirmacion.resizable(False, False)
+    ventanaConfirmacion.overrideredirect(1)
+
+    nombreLabel = tk.Label(ventanaConfirmacion, text= "Nombre de la lista: ", bg = "cyan" , font = ("arial bold", 15))
+    nombreLabel.grid(column = 0, row = 0, pady = 15, padx = 15)
+
+    nombreLista = tk.Entry(ventanaConfirmacion , font = ("arial bold", 15))
+    nombreLista.grid(column = 1, row =0, pady = 15 )
+
+    btnCancelar = tk.Button(ventanaConfirmacion, text = "CANCELAR", bg = "red", font = ("arial bold", 15), width = 10, command = ventanaConfirmacion.destroy)
+    btnCancelar.grid(column = 0, row = 1, pady = 15, padx = 15)
+
+    btnCrear = tk.Button(ventanaConfirmacion, text = "CREAR", bg = "green", font = ("arial bold", 15), width = 10)
+    btnCrear.grid(column = 1, row = 1, pady = 15)
+
+    ventanaConfirmacion.grab_set() # capture keyboard/mouse events
+    # ventanaConfirmacion.wait_window() 
+    # window.wait_visibility()
+    #ventanaConfirmacion.wait_visibility()
+
+
+
 
 def regresar():
     paginaTest.pack_forget()
