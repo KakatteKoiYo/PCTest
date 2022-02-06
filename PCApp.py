@@ -49,7 +49,7 @@ def conexionBaseDatos():
         cursor.execute("INSERT INTO tabla2 (palabra1, palabra2, descripcion) VALUES('Negro', 'Black', 'Color de la oscuridad')")
         cursor.execute("INSERT INTO tabla2 (palabra1, palabra2, descripcion) VALUES('Blanco', 'White', 'Color de las nubes')")
         cursor.execute("INSERT INTO tabla2 (palabra1, palabra2, descripcion) VALUES('Amarillo', 'Yellow', 'Color del platano')")
-        cursor.execute("INSERT INTO tabla2 (palabra1, palabra2, descripcion) VALUES('Naranja', 'Oranje', 'Color de... la naranja')")
+        cursor.execute("INSERT INTO tabla2 (palabra1, palabra2, descripcion) VALUES('Naranja', 'Orange', 'Color de... la naranja')")
         cursor.execute("INSERT INTO tabla2 (palabra1, palabra2, descripcion) VALUES('Gris', 'Grey', 'Color del humo')")
         con.commit()
         #cursor.execute("SELECT name FROM sqlite_master where type= 'table'")
