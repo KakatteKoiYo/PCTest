@@ -134,7 +134,6 @@ def nivelar(nivel, tabla, opcion, idItem):
     #return "Se actualizó la base de datos"
 
 
-
 def crearListaSQL(nombreTabla, nombreLista, listaObjetos):
     try:
         con = db.connect("perfil.db")
@@ -152,7 +151,6 @@ def crearListaSQL(nombreTabla, nombreLista, listaObjetos):
         print("Ocurrió un error")
         return "Ocurrió un error"
     
-
 def generarLista():
     listaCompleta = campoDatos.get("1.0",tk.END)
     listaArray = []
@@ -250,14 +248,12 @@ Se recomienda crear la lista con más de 10 objetos.
         verListaBoton.config(state = "normal", command = lambda x = idVar: verLista(x))
         iniciarBoton.config(state = "normal", command = lambda x = idVar: iniciarPag(x))
 
-
 def verLista(idVar):
     destruirInicio()
     def mayus(e):
         return e.upper()
     def mostrarDetalles(e):
 
-        
         datosArray = listaAlfabetica[listaObjetos.curselection()[0]].split("/#IDINVISIBLE#/")[1]
         detalleTexto = listaAlfabetica[listaObjetos.curselection()[0]].split("/#IDINVISIBLE#/")[0].split("=")[0]
         detalleDefinicion = listaAlfabetica[listaObjetos.curselection()[0]].split("/#IDINVISIBLE#/")[0].split("=")[1]
@@ -272,13 +268,13 @@ def verLista(idVar):
             nivelLabel.config(text = "Nivel: Indefinido")
         else:
             if detalleNivel == 1 or detalleNivel == 2:
-                mensaje = "Nivel:" + " ■ | " +"Falta practicar"
+                mensaje = "Nivel:" + " ■         | " +"Falta practicar"
             if detalleNivel == 3 or detalleNivel == 4:
-                mensaje = "Nivel:" + " ■ ■ | " +"Regular" 
+                mensaje = "Nivel:" + " ■ ■       | " +"Regular" 
             if detalleNivel == 5 or detalleNivel == 6:
-                mensaje = "Nivel:" + " ■ ■ ■ | " +"Bueno"
+                mensaje = "Nivel:" + " ■ ■ ■     | " +"Bueno"
             if detalleNivel == 7 or detalleNivel == 8:
-                mensaje = "Nivel:" + " ■ ■ ■ ■ | " +"Muy bien"
+                mensaje = "Nivel:" + " ■ ■ ■ ■   | " +"Muy bien"
             if detalleNivel == 9:
                 mensaje = "Nivel:" + " ■ ■ ■ ■ ■ | " +"Excelente"
             if detalleNivel == 10:
@@ -292,6 +288,9 @@ def verLista(idVar):
         campoDescripcion.insert(tk.INSERT, detalleDescripcion)
         campoDescripcion.config(state = "disabled")
 
+        btnEnTest.config(state = "normal")
+        btnEliminar.config(state = "normal")
+        btnEditarDes.config(state = "normal")
 
     objetosArray = []
     objetosArray = objetosTabla(obtenerTabla(idVar))
@@ -315,19 +314,19 @@ def verLista(idVar):
     textoSignificadoLabel = tk.Label(detallesFrame, text = "", bg = colorFondoTest, fg = "grey", font = ("Arial ", 20))
     textoSignificadoLabel.pack(pady = 30, fill = "x", expand = True)
 
-    nivelLabel = tk.Label(detallesFrame, text = "Nivel: ■ ■ ■ ■     | Excelente", bg = colorFondoTest, fg = "white", font = ("Arial ", 18))
+    nivelLabel = tk.Label(detallesFrame, text = "", bg = colorFondoTest, fg = "white", font = ("Arial ", 18))
     nivelLabel.pack(pady = 10)
 
     botonesFrame = tk.Frame(detallesFrame, bg = colorFondoTest)
     botonesFrame.pack()
 
-    btnEnTest = tk.Button(botonesFrame, text = "Desactivar en test", bg = colorFondoTest, fg = colorLetraTest, font = ("Arial ", 17))
+    btnEnTest = tk.Button(botonesFrame, text = "Desactivar en test" , state ="disabled", bg = colorFondoTest, fg = colorLetraTest, font = ("Arial ", 17))
     btnEnTest.grid(column = 0, row = 0)
 
-    btnEliminar = tk.Button(botonesFrame, text = "Eliminar de lista", bg = colorFondoTest, fg = colorLetraTest, font = ("Arial ", 17))
+    btnEliminar = tk.Button(botonesFrame, text = "Eliminar de lista" , state ="disabled", bg = colorFondoTest, fg = colorLetraTest, font = ("Arial ", 17))
     btnEliminar.grid(column = 1, row = 0, padx = 5)
 
-    btnEditarDes = tk.Button(botonesFrame, text = "Editar descripción", bg = colorFondoTest, fg = colorLetraTest,font = ("Arial ", 17))
+    btnEditarDes = tk.Button(botonesFrame, text = "Editar descripción" , state ="disabled", bg = colorFondoTest, fg = colorLetraTest,font = ("Arial ", 17))
     btnEditarDes.grid(column = 2, row = 0)
 
     descripcionFrame = tk.Frame(detallesFrame)
@@ -353,7 +352,7 @@ def verLista(idVar):
         listaObjetos.insert(tk.END, elemento.split("/#IDINVISIBLE#/")[0] + " " + nivelSimbol)
     
 def iniciarPag(idVar, numPreguntas = 10):
-    print(obtenerUltimaTabla())
+    
     global paginaTest, contador, resultadoLista #numPreguntasGlobal
     #numPreguntasGlobal = numPreguntas
     tablaActual = obtenerTabla(idVar)
@@ -372,11 +371,12 @@ def iniciarPag(idVar, numPreguntas = 10):
     resultadosLabel.place(x= 20, y = 10)
 
     avanceLabel = tk.Label(paginaTest, text = "{}/{}".format(contador,numPreguntas), bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 20))
-    avanceLabel.place(x = 800, y = 100)
+    avanceLabel.place(x = 1000, y = 50)
     def iniciarTest(respuesta = 0):
         global contador
         if contador == numPreguntas:
-            regresar()
+            mostrarPaginaResultado()
+            #regresar()
 
         
         opciones = []
@@ -448,7 +448,7 @@ def iniciarPag(idVar, numPreguntas = 10):
                 for l in list:
                     l.destroy()
                 testInterfazFrame.destroy()
-                iniciarTest()
+                
                 if x == lugarRespuesta:
                     resultadoLista = resultadoLista + "O {0} = {1} \n".format(palabraPrincipal, opciones[x])
                     resultadosLabel.config(text= resultadoLista)
@@ -457,17 +457,29 @@ def iniciarPag(idVar, numPreguntas = 10):
                     resultadoLista = resultadoLista + "X {0} = {1} -> O {2} = {3} \n".format(palabraPrincipal, opciones[x], palabraPrincipal, opciones[lugarRespuesta])
                     resultadosLabel.config(text= resultadoLista)
                     nivelar(nivelPrincipal, tablaActual, 0, idPrincipal)
+                iniciarTest()
             except Exception as e: 
                 print(e)
     # def verificarRespuesta():
-
     iniciarTest()
+
+def mostrarPaginaResultado():
+    destruirTestInicio()
+    resultadoFrame = tk.Frame(window)
+    resultadoFrame.pack(fill = "both", expand = True)
+
+    resultadoPalabra1 = tk.Label(resultadoFrame, text = "HOLA", bg = colorFondoTest, fg = colorLetraTest, font = ("Arial", 20))
+    resultadoPalabra1.pack()
+    resultadoPalabra2 = tk.Label(resultadoFrame, text = "ADIOS", bg = colorFondoTest, fg = colorLetraTest, font = ("Arial", 20))
+    resultadoPalabra2.pack()
+
+    # listaCorrectas = tk.Listbox(resultadoFrame, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial", 20))
+    # listaCorrectas.pack()
 
 def generarNombreTabla():
     numeroUltimaTabla = int(obtenerUltimaTabla().split("tabla")[1])
     nombreNuevoTabla = "tabla" + str(numeroUltimaTabla + 1)
     return nombreNuevoTabla
-
 
 def formNuevaLista(listaArray):
     
@@ -524,10 +536,15 @@ def destruirInicio():
     paginaInicio.destroy()
 
 def destruirTestInicio():
-    list = paginaTest.winfo_children()
-    for l in list:
-        l.destroy()
-    paginaTest.destroy()
+    paginaTest.pack_forget()
+    # print("inicio")
+    # list = paginaTest.winfo_children()
+    # for l in list:
+    #     l.destroy()
+    # paginaTest.destroy()
+    # print("final")
+    #paginaTest.destroy()
+
 
 pantallaInicio()
 window.mainloop()
