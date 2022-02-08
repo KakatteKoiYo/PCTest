@@ -1,3 +1,4 @@
+from cgitb import text
 import tkinter as tk 
 import sqlite3 as db
 import os.path as fs
@@ -23,34 +24,57 @@ def conexionBaseDatos():
     else:
         con = db.connect("perfil.db")
         cursor = con.cursor()
-        cursor.execute("CREATE TABLE tabla1(id integer PRIMARY KEY, palabra1 text, palabra2 text, descripcion text)")
+        cursor.execute("CREATE TABLE tabla1(id integer PRIMARY KEY, palabra1 text, palabra2 text, descripcion text DEFAULT 'Descripción no disponible', disponible integer DEFAULT 1 NOT NULL, nivel integer DEFAULT 0 NOT NULL)")
         cursor.execute("CREATE TABLE nombreslista(id integer PRIMARY KEY, nombre text, tabla text)")
-        cursor.execute("INSERT INTO nombreslista (nombre, tabla) VALUES('Meses en Inglés (ejemplo)', 'tabla1')")
-        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2, descripcion) VALUES('January', 'Enero', 'Primer mes')")
-        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2, descripcion) VALUES('February', 'Febrero', 'Segundo mes')")
-        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2, descripcion) VALUES('March', 'Marzo', 'Tercer mes')")
-        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2, descripcion) VALUES('April', 'Abril', 'Cuarto mes')")
-        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2, descripcion) VALUES('May', 'Mayo', 'Quinto mes')")
-        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2, descripcion) VALUES('June', 'Junio', 'Sexto mes')")
-        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2, descripcion) VALUES('July', 'Julio', 'Séptimo mes')")
-        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2, descripcion) VALUES('August', 'Agosto', 'Octavo mes')")
-        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2, descripcion) VALUES('September', 'Septiembre', 'Noveno mes')")
-        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2, descripcion) VALUES('October', 'Octubre', 'Décimo mes')")
-        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2, descripcion) VALUES('November', 'Noviembre', 'Onceavo mes')")
-        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2, descripcion) VALUES('December', 'Diciembre', 'Doceavo mes')")
-        cursor.execute("CREATE TABLE tabla2(id integer PRIMARY KEY, palabra1 text, palabra2 text, descripcion text)")
-        cursor.execute("INSERT INTO nombreslista (nombre, tabla) VALUES('Colores en Inglés (ejemplo)', 'tabla2')")
-        cursor.execute("INSERT INTO tabla2 (palabra1, palabra2, descripcion) VALUES('Azul', 'Blue', 'Color del cielo')")
-        cursor.execute("INSERT INTO tabla2 (palabra1, palabra2, descripcion) VALUES('Rojo', 'Red', 'Color de las manzanas')")
-        cursor.execute("INSERT INTO tabla2 (palabra1, palabra2, descripcion) VALUES('Verde', 'Green', 'Color de las plantas')")
-        cursor.execute("INSERT INTO tabla2 (palabra1, palabra2, descripcion) VALUES('Café', 'Brown', 'Color de la tierra')")
-        cursor.execute("INSERT INTO tabla2 (palabra1, palabra2, descripcion) VALUES('Morado', 'Purple', 'Color de las Uvas')")
-        cursor.execute("INSERT INTO tabla2 (palabra1, palabra2, descripcion) VALUES('Rosa', 'Pink', 'Color del ajolote')")
-        cursor.execute("INSERT INTO tabla2 (palabra1, palabra2, descripcion) VALUES('Negro', 'Black', 'Color de la oscuridad')")
-        cursor.execute("INSERT INTO tabla2 (palabra1, palabra2, descripcion) VALUES('Blanco', 'White', 'Color de las nubes')")
-        cursor.execute("INSERT INTO tabla2 (palabra1, palabra2, descripcion) VALUES('Amarillo', 'Yellow', 'Color del platano')")
-        cursor.execute("INSERT INTO tabla2 (palabra1, palabra2, descripcion) VALUES('Naranja', 'Orange', 'Color de... la naranja')")
-        cursor.execute("INSERT INTO tabla2 (palabra1, palabra2, descripcion) VALUES('Gris', 'Grey', 'Color del humo')")
+        cursor.execute("INSERT INTO nombreslista (nombre, tabla) VALUES('Animales en Inglés (ejemplo)', 'tabla1')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Bull', 'Toro')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Cow', 'Vaca')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Chicken', 'Pollo')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Hen', 'Gallina')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Rooster/Cock', 'Gallo')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Donkey', 'Burro')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Goat', 'Cabra')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Horse', 'Caballo')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Pig', 'Cerdo')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Rabbit', 'Conejo')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Sheep', 'Oveja')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Turkey', 'Pavo')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Goose', 'Ganso')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Shrimp', 'Camarón')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Crab', 'Cangrejo')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Dolphin', 'Delfín')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Shark', 'Tiburón')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Eel', 'Anguila')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Whale', 'Ballena')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Killer whale', 'Orca')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Jellyfish', 'Medusa')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Lobster', 'Langosta')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Octopus', 'Pulpo')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Oyster', 'Ostra')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Clam', 'Almeja')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Seal', 'Foca')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Squid', 'Calamar')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Cuttlefish', 'Sepia')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Boar', 'Jabalí')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Deer', 'Ciervo')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Mouse', 'Ratón')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Racoon', 'Mapache')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Skunk', 'Mofeta')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Squirrel', 'Ardilla')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Bat', 'Murciélago')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Bear', 'Oso')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Weasel', 'Comadreja')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Moose', 'Alce')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Falcon', 'Halcón')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Eagle', 'Águila')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Vulture', 'Buitre')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Hummingbird', 'Colibrí')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Crow', 'Cuervo')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Owl', 'Búho')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Stork', 'Cigüeña')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Duck', 'Pato')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Cat', 'Gato')")
+        cursor.execute("INSERT INTO tabla1 (palabra1, palabra2) VALUES('Dog', 'Perro')")
         con.commit()
         #cursor.execute("SELECT name FROM sqlite_master where type= 'table'")
         cursor.execute("SELECT id, nombre FROM nombreslista")
@@ -81,10 +105,53 @@ def obtenerUltimaTabla():
 def objetosTabla(tabla):
     con = db.connect("perfil.db")
     cursor = con.cursor()
-    cursor.execute("SELECT palabra1, palabra2 FROM {}".format(tabla))
+    cursor.execute("SELECT palabra1, palabra2, descripcion, disponible, nivel, id  FROM {}".format(tabla))
     objetos = cursor.fetchall()
     con.close()
     return objetos
+
+# def obtenerItem(idItem, tabla):
+#     con = db.connect("perfil.db")
+#     cursor = con.cursor()
+#     cursor.execute("SELECT palabra1, palabra2, descripcion, disponible, nivel FROM {} where id = ?".format(tabla), [idItem])
+#     objetoEspecifico = cursor.fetchall()
+#     con.close()
+#     return objetoEspecifico
+def nivelar(nivel, tabla, opcion, idItem):
+    if opcion == 1:
+        nivel = nivel + 1
+    if opcion == 0:
+        nivel = nivel - 1
+    if nivel > 10:
+        nivel = 10
+    if nivel < 0:
+        nivel = 0
+    con = db.connect("perfil.db")
+    cursor = con.cursor()
+    cursor.execute("UPDATE {} SET nivel = ? where id = ?".format(tabla), (nivel, idItem))
+    con.commit()
+    con.close()
+    #return "Se actualizó la base de datos"
+
+
+
+def crearListaSQL(nombreTabla, nombreLista, listaObjetos):
+    try:
+        con = db.connect("perfil.db")
+        cursor = con.cursor()
+        cursor.execute("CREATE TABLE {}(id integer PRIMARY KEY, palabra1 text, palabra2 text, descripcion text DEFAULT 'Descripción no disponible', disponible integer DEFAULT 1 NOT NULL, nivel integer DEFAULT 0 NOT NULL)".format(nombreTabla))
+        for texto, significado in listaObjetos:
+            cursor.execute("INSERT INTO {}(palabra1, palabra2) VALUES(?,?)".format(nombreTabla), (texto, significado))
+
+        cursor.execute("INSERT INTO nombreslista (nombre, tabla) VALUES(?, ?)", (nombreLista, nombreTabla))
+        con.commit()
+        con.close()
+        print("Lista creada")
+        return "Lista creada"
+    except:
+        print("Ocurrió un error")
+        return "Ocurrió un error"
+    
 
 def generarLista():
     listaCompleta = campoDatos.get("1.0",tk.END)
@@ -97,8 +164,8 @@ def generarLista():
             if i != "" and "=" in i and len(i.split("=")) == 2:
                 listaArray.append(i.split("="))
 
-        print(len(listaArray))
-        formNuevaLista()
+        
+        formNuevaLista(listaArray)
         
     except Exception as e:
         print(e)
@@ -159,7 +226,7 @@ Se recomienda crear la lista con más de 10 objetos.
         lista.insert(tk.END, nombreLista[1])
 
 
-    miListaBoton = tk.Button(paginaInicio, text = "Cargar lista seleccionada", width = 32, font = ("Arial ", 15), command = lambda : mostrar())
+    miListaBoton = tk.Button(paginaInicio, text = "Cargar lista seleccionada", width = 32, font = ("Arial ", 15), command = lambda : cargar())
     miListaBoton.place(x = 12, y = 660)
 
     labelCargado =tk.Label(paginaInicio, text = "Lista: ")
@@ -167,25 +234,130 @@ Se recomienda crear la lista con más de 10 objetos.
     campoCargado = tk.Text(paginaInicio, width = 30, height = 1, state = "disabled")
     campoCargado.place(x = 450, y = 500)
 
+    verListaBoton = tk.Button(paginaInicio, text = "Ver lista", font = ("Arial ", 10), state = "disabled" )
+    verListaBoton.place(x = 400, y = 550)
     iniciarBoton = tk.Button(paginaInicio, text = "Iniciar", width = 15, font = ("Arial ", 20), state = "disabled")
     iniciarBoton.place(x = 900, y = 500)
 
 
-    def mostrar():
+    def cargar():
         idVar = idArray[lista.curselection()[0]]
         campoCargado.config(state = "normal")
         campoCargado.delete('1.0',tk.END)
         campoCargado.insert(tk.END, nombreArray[lista.curselection()[0]])
         campoCargado.config(state = "disabled")
 
+        verListaBoton.config(state = "normal", command = lambda x = idVar: verLista(x))
         iniciarBoton.config(state = "normal", command = lambda x = idVar: iniciarPag(x))
 
 
+def verLista(idVar):
+    destruirInicio()
+    def mayus(e):
+        return e.upper()
+    def mostrarDetalles(e):
+
+        
+        datosArray = listaAlfabetica[listaObjetos.curselection()[0]].split("/#IDINVISIBLE#/")[1]
+        detalleTexto = listaAlfabetica[listaObjetos.curselection()[0]].split("/#IDINVISIBLE#/")[0].split("=")[0]
+        detalleDefinicion = listaAlfabetica[listaObjetos.curselection()[0]].split("/#IDINVISIBLE#/")[0].split("=")[1]
+        detalleDescripcion = datosArray.split(",")[1]
+        detalleDisponible = int(datosArray.split(",")[2])
+        detalleNivel = int(datosArray.split(",")[3])
+        
+        textoPrincipalLabel.config(text = detalleTexto)
+        textoSignificadoLabel.config(text = detalleDefinicion)
+
+        if detalleNivel == 0:
+            nivelLabel.config(text = "Nivel: Indefinido")
+        else:
+            if detalleNivel == 1 or detalleNivel == 2:
+                mensaje = "Nivel:" + " ■ | " +"Falta practicar"
+            if detalleNivel == 3 or detalleNivel == 4:
+                mensaje = "Nivel:" + " ■ ■ | " +"Regular" 
+            if detalleNivel == 5 or detalleNivel == 6:
+                mensaje = "Nivel:" + " ■ ■ ■ | " +"Bueno"
+            if detalleNivel == 7 or detalleNivel == 8:
+                mensaje = "Nivel:" + " ■ ■ ■ ■ | " +"Muy bien"
+            if detalleNivel == 9:
+                mensaje = "Nivel:" + " ■ ■ ■ ■ ■ | " +"Excelente"
+            if detalleNivel == 10:
+                mensaje = "Nivel:" + " ★ ★ ★ ★ ★| " + "Maestro"
+                
+            nivelLabel.config(text =  mensaje)
+
+
+        campoDescripcion.config(state = "normal")
+        campoDescripcion.delete('1.0',tk.END)
+        campoDescripcion.insert(tk.INSERT, detalleDescripcion)
+        campoDescripcion.config(state = "disabled")
+
+
+    objetosArray = []
+    objetosArray = objetosTabla(obtenerTabla(idVar))
+
+    
+    verListaFrame = tk.Frame(window)
+    verListaFrame.pack(fill = "both", expand = True)
+
+
+    listaObjetos = tk.Listbox(verListaFrame, width= 100, height = 40)
+    listaObjetos.pack(side = tk.LEFT)
+
+    listaObjetos.bind("<<ListboxSelect>>", mostrarDetalles)
+
+    detallesFrame = tk.Frame(verListaFrame, bg = "black")
+    detallesFrame.pack(side = tk.LEFT, fill = "both", expand = True)
+
+    textoPrincipalLabel = tk.Label(detallesFrame, text = "", bg = colorFondoTest, fg = "white", font = ("Arial ", 25))
+    textoPrincipalLabel.pack(pady = 15, fill = "x", expand = True)
+
+    textoSignificadoLabel = tk.Label(detallesFrame, text = "", bg = colorFondoTest, fg = "grey", font = ("Arial ", 20))
+    textoSignificadoLabel.pack(pady = 30, fill = "x", expand = True)
+
+    nivelLabel = tk.Label(detallesFrame, text = "Nivel: ■ ■ ■ ■     | Excelente", bg = colorFondoTest, fg = "white", font = ("Arial ", 18))
+    nivelLabel.pack(pady = 10)
+
+    botonesFrame = tk.Frame(detallesFrame, bg = colorFondoTest)
+    botonesFrame.pack()
+
+    btnEnTest = tk.Button(botonesFrame, text = "Desactivar en test", bg = colorFondoTest, fg = colorLetraTest, font = ("Arial ", 17))
+    btnEnTest.grid(column = 0, row = 0)
+
+    btnEliminar = tk.Button(botonesFrame, text = "Eliminar de lista", bg = colorFondoTest, fg = colorLetraTest, font = ("Arial ", 17))
+    btnEliminar.grid(column = 1, row = 0, padx = 5)
+
+    btnEditarDes = tk.Button(botonesFrame, text = "Editar descripción", bg = colorFondoTest, fg = colorLetraTest,font = ("Arial ", 17))
+    btnEditarDes.grid(column = 2, row = 0)
+
+    descripcionFrame = tk.Frame(detallesFrame)
+    descripcionFrame.pack()
+
+    descripcionLabel = tk.Label(descripcionFrame, text = "Descripción", bg = colorFondoTest, fg = colorLetraTest, font = ("Arial ", 15))
+    descripcionLabel.pack(fill = "both")
+    campoDescripcion = tk.Text(descripcionFrame, height= 10, state ="disabled", bg = colorFondoTest, fg = colorLetraTest)
+    campoDescripcion.pack()
+
+    btnGuardar = tk.Button(detallesFrame, text = "Guardar", state = "disabled", bg = colorFondoTest, fg = colorLetraTest, font = ("Arial ", 15))
+    btnGuardar.pack(fill = "both")
+
+    listaAlfabetica = []
+
+    for texto, significado, descripcion, disponible, nivel, idItem in objetosArray:
+        
+        listaAlfabetica.append("{} = {}/#IDINVISIBLE#/{}, {}, {}, {}".format(texto, significado, idItem, descripcion, disponible, nivel))
+        
+    listaAlfabetica.sort(key = mayus)
+    for elemento in listaAlfabetica:
+        nivelSimbol = "|" + ("·"*int(elemento.split("/#IDINVISIBLE#/")[1].split(",")[3])) + "|" if int(elemento.split("/#IDINVISIBLE#/")[1].split(",")[3]) > 0 else ""
+        listaObjetos.insert(tk.END, elemento.split("/#IDINVISIBLE#/")[0] + " " + nivelSimbol)
+    
 def iniciarPag(idVar, numPreguntas = 10):
     print(obtenerUltimaTabla())
     global paginaTest, contador, resultadoLista #numPreguntasGlobal
     #numPreguntasGlobal = numPreguntas
-    objetosArray = objetosTabla(obtenerTabla(idVar))
+    tablaActual = obtenerTabla(idVar)
+    objetosArray = objetosTabla(tablaActual)
     resultadoLista = ""
 
     paginaInicio.pack_forget()
@@ -203,7 +375,6 @@ def iniciarPag(idVar, numPreguntas = 10):
     avanceLabel.place(x = 800, y = 100)
     def iniciarTest(respuesta = 0):
         global contador
-
         if contador == numPreguntas:
             regresar()
 
@@ -216,6 +387,8 @@ def iniciarPag(idVar, numPreguntas = 10):
         randomPregunta = random.randint(0, len(objetosArray)-1)
 
         palabraPrincipal = objetosArray[randomPregunta][0]
+        nivelPrincipal = int(objetosArray[randomPregunta][4])
+        idPrincipal = objetosArray[randomPregunta][5]
         palabraPrincipalAncho = len(palabraPrincipal)
         palabraPrincipalLabel = tk.Label(testInterfazFrame, text = palabraPrincipal, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 40), width = palabraPrincipalAncho)
         palabraPrincipalLabel.pack(pady = 90)
@@ -245,6 +418,9 @@ def iniciarPag(idVar, numPreguntas = 10):
 
         anchoBotonArr.sort()
         anchoBoton = anchoBotonArr[-1] + 2
+
+        if anchoBoton < 20:
+            anchoBoton = 20
 
 
         opcionBoton1 = tk.Button(testInterfazFrame, text = opciones[0], width = anchoBoton, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 25), 
@@ -276,24 +452,39 @@ def iniciarPag(idVar, numPreguntas = 10):
                 if x == lugarRespuesta:
                     resultadoLista = resultadoLista + "O {0} = {1} \n".format(palabraPrincipal, opciones[x])
                     resultadosLabel.config(text= resultadoLista)
+                    nivelar(nivelPrincipal, tablaActual, 1, idPrincipal)
                 else:
                     resultadoLista = resultadoLista + "X {0} = {1} -> O {2} = {3} \n".format(palabraPrincipal, opciones[x], palabraPrincipal, opciones[lugarRespuesta])
                     resultadosLabel.config(text= resultadoLista)
+                    nivelar(nivelPrincipal, tablaActual, 0, idPrincipal)
             except Exception as e: 
                 print(e)
     # def verificarRespuesta():
 
     iniciarTest()
 
-def formNuevaLista():
-    # campoEjemplo.destroy()
-    # campoEjemplo.destroy()
-    # formFrame = tk.Frame(camposFrame, width = 80)
-    # formFrame.pack(side = tk.LEFT, fill = "both", expand = True)
-    # nombreLista = tk.Entry(formFrame)
-    # nombreLista.grid(column = 0, row =0 )
-    # global ventanaConfirmacionwindow.bind("<Motion>", movertop)
+def generarNombreTabla():
+    numeroUltimaTabla = int(obtenerUltimaTabla().split("tabla")[1])
+    nombreNuevoTabla = "tabla" + str(numeroUltimaTabla + 1)
+    return nombreNuevoTabla
 
+
+def formNuevaLista(listaArray):
+    
+    def crear():
+        
+        nombreLista = nombreListaInput.get()
+        if nombreLista.strip() == "":
+            astericoLabel.config(text= "*")
+            nombreListaInput.delete("0", tk.END)
+        else:
+            nombreTabla = generarNombreTabla()
+            mensaje = crearListaSQL(nombreTabla, nombreLista, listaArray)
+            print(mensaje)
+            ventanaConfirmacion.destroy()
+            destruirInicio()
+            pantallaInicio()
+    
     x = window.winfo_rootx()
     y = window.winfo_rooty()
     ventanaConfirmacion = tk.Toplevel(window, bg = "cyan")
@@ -304,29 +495,25 @@ def formNuevaLista():
     nombreLabel = tk.Label(ventanaConfirmacion, text= "Nombre de la lista: ", bg = "cyan" , font = ("arial bold", 15))
     nombreLabel.grid(column = 0, row = 0, pady = 15, padx = 15)
 
-    nombreLista = tk.Entry(ventanaConfirmacion , font = ("arial bold", 15))
-    nombreLista.grid(column = 1, row =0, pady = 15 )
+    nombreListaInput = tk.Entry(ventanaConfirmacion , font = ("arial bold", 15))
+    nombreListaInput.grid(column = 1, row =0, pady = 15 )
+
+    astericoLabel = tk.Label(ventanaConfirmacion, text= "", fg = "red",  bg = "cyan" , font = ("arial bold", 25))
+    astericoLabel.grid(column =2, row = 0)
 
     btnCancelar = tk.Button(ventanaConfirmacion, text = "CANCELAR", bg = "red", font = ("arial bold", 15), width = 10, command = ventanaConfirmacion.destroy)
     btnCancelar.grid(column = 0, row = 1, pady = 15, padx = 15)
 
-    btnCrear = tk.Button(ventanaConfirmacion, text = "CREAR", bg = "green", font = ("arial bold", 15), width = 10)
+    btnCrear = tk.Button(ventanaConfirmacion, text = "CREAR", bg = "green", font = ("arial bold", 15), width = 10, command = crear)
     btnCrear.grid(column = 1, row = 1, pady = 15)
 
-    ventanaConfirmacion.grab_set() # capture keyboard/mouse events
-    # ventanaConfirmacion.wait_window() 
-    # window.wait_visibility()
-    #ventanaConfirmacion.wait_visibility()
-
-
-
+    ventanaConfirmacion.grab_set()
 
 def regresar():
     paginaTest.pack_forget()
     paginaInicio.pack(fill = "both", expand = True)
     # destruirTestInicio()
     # pantallaInicio()
-
 def mostrar():
     print(lista.curselection())
 
