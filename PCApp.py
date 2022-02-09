@@ -3,6 +3,7 @@ import tkinter as tk
 import sqlite3 as db
 import os.path as fs
 import random, time
+from turtle import bgcolor, color
 
 
 window = tk.Tk()
@@ -353,18 +354,19 @@ def verLista(idVar):
     
 def iniciarPag(idVar, numPreguntas = 10):
     
-    global paginaTest, contador, resultadoLista #numPreguntasGlobal
+    global paginaTest, contador, resultadoLista, numeroCorrectas #numPreguntasGlobal
     #numPreguntasGlobal = numPreguntas
     tablaActual = obtenerTabla(idVar)
     objetosArray = objetosTabla(tablaActual)
     resultadoLista = ""
-
+    resultadoListaArray = []
     paginaInicio.pack_forget()
     #destruirInicio()
     paginaTest = tk.Frame(window, bg = colorFondoTest)
     paginaTest.pack(expand = True, fill = "both")
 
     contador = 0
+    numeroCorrectas = 0
     # botontest = tk.Button(paginaTest, text = "press", command = lambda : iniciarTest())
     # botontest.place(x = 0,y = 30)
     resultadosLabel = tk.Label(paginaTest, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 10), justify = "left")
@@ -375,13 +377,13 @@ def iniciarPag(idVar, numPreguntas = 10):
     def iniciarTest(respuesta = 0):
         global contador
         if contador == numPreguntas:
-            mostrarPaginaResultado()
-            #regresar()
-
+            porcentaje = (numeroCorrectas/numPreguntas)*100
+            mostrarPaginaResultado(porcentaje, resultadoListaArray)
+            return
         
         opciones = []
         numerosGenerados = []
-
+        
         testInterfazFrame = tk.Frame(paginaTest, bg = colorFondoTest)
         testInterfazFrame.pack()
         randomPregunta = random.randint(0, len(objetosArray)-1)
@@ -441,7 +443,7 @@ def iniciarPag(idVar, numPreguntas = 10):
         opcionBoton5.pack(pady = 10)
 
         def verificarRespuesta(x):
-            global resultadoLista       
+            global resultadoLista, numeroCorrectas
             try: 
                 avanceLabel.config(text = "{}/{}".format(contador, numPreguntas))
                 list = testInterfazFrame.winfo_children()
@@ -450,10 +452,13 @@ def iniciarPag(idVar, numPreguntas = 10):
                 testInterfazFrame.destroy()
                 
                 if x == lugarRespuesta:
+                    numeroCorrectas = numeroCorrectas + 1
+                    resultadoListaArray.append(("[O] {} = {}".format(palabraPrincipal, opciones[x]),1, palabraPrincipal, opciones[x]))
                     resultadoLista = resultadoLista + "O {0} = {1} \n".format(palabraPrincipal, opciones[x])
                     resultadosLabel.config(text= resultadoLista)
                     nivelar(nivelPrincipal, tablaActual, 1, idPrincipal)
                 else:
+                    resultadoListaArray.append(("[X] {} = {}".format(palabraPrincipal, opciones[x]),0,palabraPrincipal, opciones[lugarRespuesta]))
                     resultadoLista = resultadoLista + "X {0} = {1} -> O {2} = {3} \n".format(palabraPrincipal, opciones[x], palabraPrincipal, opciones[lugarRespuesta])
                     resultadosLabel.config(text= resultadoLista)
                     nivelar(nivelPrincipal, tablaActual, 0, idPrincipal)
@@ -463,16 +468,58 @@ def iniciarPag(idVar, numPreguntas = 10):
     # def verificarRespuesta():
     iniciarTest()
 
-def mostrarPaginaResultado():
+def mostrarPaginaResultado(porcentaje, resultadoArray):
     destruirTestInicio()
-    resultadoFrame = tk.Frame(window)
+    
+    def seleccionRes(e):
+       objeto = resultadoArray[listaResultadoFinal.curselection()[0]]
+       resultadoPalabra1.config(text = objeto[2])
+       resultadoPalabra2.config(text = objeto[3])
+
+    colorPorcentaje = ""
+    if porcentaje <= 100:
+        colorPorcentaje = "green"
+    if porcentaje < 80:
+        colorPorcentaje = "yellow"
+    if porcentaje < 50:
+        colorPorcentaje = "red"
+
+
+    resultadoFrame = tk.Frame(window, bg = colorFondoTest)
     resultadoFrame.pack(fill = "both", expand = True)
 
-    resultadoPalabra1 = tk.Label(resultadoFrame, text = "HOLA", bg = colorFondoTest, fg = colorLetraTest, font = ("Arial", 20))
-    resultadoPalabra1.pack()
-    resultadoPalabra2 = tk.Label(resultadoFrame, text = "ADIOS", bg = colorFondoTest, fg = colorLetraTest, font = ("Arial", 20))
-    resultadoPalabra2.pack()
+    resultadoPalabra1 = tk.Label(resultadoFrame, text = "", bg = colorFondoTest, fg = colorLetraTest, font = ("Arial", 20))
+    resultadoPalabra1.pack(fill = "both", expand = True)
+    resultadoPalabra2 = tk.Label(resultadoFrame, text = "", bg = colorFondoTest, fg = colorLetraTest, font = ("Arial", 20))
+    resultadoPalabra2.pack(fill = "both", expand = True)
 
+    listaResultadoFinal = tk.Listbox(resultadoFrame,  bg = colorFondoTest, height= 10, fg = colorLetraTest, font = ("Arial", 13))
+    listaResultadoFinal.pack(fill = "both", expand = True)
+    #index = 0
+    #colorBG = ""
+    for res in resultadoArray:
+        #if res[1] == 1:
+        #    colorBG = "green"
+        #else:
+        #    colorBG  ="red"
+
+        listaResultadoFinal.insert(tk.END, res[0])
+        #listaResultadoFinal.itemconfigure(index, bg = colorBG)
+        #index = index + 1
+
+    listaResultadoFinal.bind("<<ListboxSelect>>", seleccionRes)
+
+    
+
+    bottonFrame = tk.Frame(resultadoFrame, bg = colorFondoTest)
+    bottonFrame.pack(fill = "x")
+    btnSalir = tk.Button(bottonFrame, text = "Salir", bg = colorFondoTest, fg = colorLetraTest, font = ("Arial", 20))
+    btnSalir.pack(side = tk.LEFT, fill = "both", expand = True)
+
+    precisionLabel = tk.Label(bottonFrame, text = "Precisión: ", bg = colorFondoTest, fg = colorLetraTest, font = ("Arial", 20))
+    precisionLabel.pack(side = tk.LEFT)
+    porcentajeLabel = tk.Label(bottonFrame, text = str(porcentaje) + "%", bg = colorFondoTest, fg = colorPorcentaje, font = ("Arial", 20))
+    porcentajeLabel.pack(side = tk.LEFT)
     # listaCorrectas = tk.Listbox(resultadoFrame, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial", 20))
     # listaCorrectas.pack()
 
@@ -536,14 +583,11 @@ def destruirInicio():
     paginaInicio.destroy()
 
 def destruirTestInicio():
-    paginaTest.pack_forget()
-    # print("inicio")
-    # list = paginaTest.winfo_children()
-    # for l in list:
-    #     l.destroy()
-    # paginaTest.destroy()
-    # print("final")
-    #paginaTest.destroy()
+    list = paginaTest.winfo_children()
+    for l in list:
+        l.destroy()
+    paginaTest.destroy()
+    paginaTest.destroy()
 
 
 pantallaInicio()
