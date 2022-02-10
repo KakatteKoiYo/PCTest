@@ -1,4 +1,5 @@
 from cgitb import text
+from glob import glob
 import tkinter as tk 
 import sqlite3 as db
 import os.path as fs
@@ -250,7 +251,9 @@ Se recomienda crear la lista con más de 10 objetos.
         iniciarBoton.config(state = "normal", command = lambda x = idVar: iniciarPag(x))
 
 def verLista(idVar):
-    destruirInicio()
+    global verListaFrame
+    paginaInicio.pack_forget()
+    #destruirInicio()
     def mayus(e):
         return e.upper()
     def mostrarDetalles(e):
@@ -300,9 +303,14 @@ def verLista(idVar):
     verListaFrame = tk.Frame(window)
     verListaFrame.pack(fill = "both", expand = True)
 
+    leftSide = tk.Frame(verListaFrame)
+    leftSide.pack(side = tk.LEFT)
 
-    listaObjetos = tk.Listbox(verListaFrame, width= 100, height = 40)
-    listaObjetos.pack(side = tk.LEFT)
+    btnSalir = tk.Button(leftSide, text = "Salir", command = salirLista)
+    btnSalir.pack(fill = "both")
+
+    listaObjetos = tk.Listbox(leftSide, width= 100, height = 43)
+    listaObjetos.pack()
 
     listaObjetos.bind("<<ListboxSelect>>", mostrarDetalles)
 
@@ -583,6 +591,15 @@ def regresar():
     paginaInicio.pack(fill = "both", expand = True)
     # 
     # pantallaInicio()
+
+def salirLista():
+    list = verListaFrame.winfo_children()
+    for l in list:
+        l.destroy()
+    verListaFrame.destroy()
+    paginaInicio.pack(fill = "both", expand = True)
+
+    
 def mostrar():
     print(lista.curselection())
 
