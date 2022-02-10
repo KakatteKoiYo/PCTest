@@ -352,7 +352,7 @@ def verLista(idVar):
         nivelSimbol = "|" + ("·"*int(elemento.split("/#IDINVISIBLE#/")[1].split(",")[3])) + "|" if int(elemento.split("/#IDINVISIBLE#/")[1].split(",")[3]) > 0 else ""
         listaObjetos.insert(tk.END, elemento.split("/#IDINVISIBLE#/")[0] + " " + nivelSimbol)
     
-def iniciarPag(idVar, numPreguntas = 10):
+def iniciarPag(idVar, numPreguntas = 20):
     
     global paginaTest, contador, resultadoLista, numeroCorrectas #numPreguntasGlobal
     #numPreguntasGlobal = numPreguntas
@@ -367,18 +367,20 @@ def iniciarPag(idVar, numPreguntas = 10):
 
     contador = 0
     numeroCorrectas = 0
-    # botontest = tk.Button(paginaTest, text = "press", command = lambda : iniciarTest())
-    # botontest.place(x = 0,y = 30)
+    botontest = tk.Button(paginaTest, text = "Abortar", borderwidth=0, bg = colorFondoTest, fg = "grey", font = ("Arial bold", 15)
+    , command = lambda : regresar())
+
+    botontest.place(x = 100,y = 20)
     resultadosLabel = tk.Label(paginaTest, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 10), justify = "left")
-    resultadosLabel.place(x= 20, y = 10)
+    resultadosLabel.place(x= 20, y = 70)
 
     avanceLabel = tk.Label(paginaTest, text = "{}/{}".format(contador,numPreguntas), bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 20))
-    avanceLabel.place(x = 1000, y = 50)
+    avanceLabel.place(x = 1050, y = 30)
     def iniciarTest(respuesta = 0):
         global contador
         if contador == numPreguntas:
             porcentaje = (numeroCorrectas/numPreguntas)*100
-            mostrarPaginaResultado(porcentaje, resultadoListaArray)
+            mostrarPaginaResultado(porcentaje, resultadoListaArray, idVar)
             return
         
         opciones = []
@@ -468,7 +470,8 @@ def iniciarPag(idVar, numPreguntas = 10):
     # def verificarRespuesta():
     iniciarTest()
 
-def mostrarPaginaResultado(porcentaje, resultadoArray):
+def mostrarPaginaResultado(porcentaje, resultadoArray, idVar):
+    global resultadoFrame
     destruirTestInicio()
     
     def seleccionRes(e):
@@ -513,8 +516,15 @@ def mostrarPaginaResultado(porcentaje, resultadoArray):
 
     bottonFrame = tk.Frame(resultadoFrame, bg = colorFondoTest)
     bottonFrame.pack(fill = "x")
-    btnSalir = tk.Button(bottonFrame, text = "Salir", bg = colorFondoTest, fg = colorLetraTest, font = ("Arial", 20))
+    btnSalir = tk.Button(bottonFrame, text = "Salir", bg = colorFondoTest, fg = colorLetraTest, font = ("Arial", 20)
+    , command = lambda : destruirResultado())
     btnSalir.pack(side = tk.LEFT, fill = "both", expand = True)
+    
+    btnReiniciar = tk.Button(bottonFrame, text = "Test otra vez", bg = colorFondoTest, fg = colorLetraTest, font = ("Arial", 20)
+    , command = lambda : destruirResultado(idVar, 0))
+    btnReiniciar.pack(side = tk.LEFT, fill = "both", expand = True)
+    
+
 
     precisionLabel = tk.Label(bottonFrame, text = "Precisión: ", bg = colorFondoTest, fg = colorLetraTest, font = ("Arial", 20))
     precisionLabel.pack(side = tk.LEFT)
@@ -569,12 +579,23 @@ def formNuevaLista(listaArray):
     ventanaConfirmacion.grab_set()
 
 def regresar():
-    paginaTest.pack_forget()
+    destruirTestInicio()
     paginaInicio.pack(fill = "both", expand = True)
-    # destruirTestInicio()
+    # 
     # pantallaInicio()
 def mostrar():
     print(lista.curselection())
+
+def destruirResultado(idVar = "", salir = 1):
+    list = resultadoFrame.winfo_children()
+    for l in list:
+        l.destroy()
+    resultadoFrame.destroy()
+    if salir == 1:
+        pantallaInicio()
+    else:
+        iniciarPag(idVar)
+
 
 def destruirInicio():
     list = paginaInicio.winfo_children()
