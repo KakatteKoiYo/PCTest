@@ -88,6 +88,7 @@ def conexionBaseDatos():
 
         return rows
 
+
 def obtenerTabla(idVar):
     con = db.connect("perfil.db")
     cursor = con.cursor()
@@ -107,10 +108,27 @@ def obtenerUltimaTabla():
 def objetosTabla(tabla):
     con = db.connect("perfil.db")
     cursor = con.cursor()
+    cursor.execute("SELECT palabra1, palabra2, descripcion, disponible, nivel, id  FROM {} WHERE disponible = 1".format(tabla))
+    objetos = cursor.fetchall()
+    con.close()
+    return objetos
+
+def todosObjetosTabla(tabla):
+    con = db.connect("perfil.db")
+    cursor = con.cursor()
     cursor.execute("SELECT palabra1, palabra2, descripcion, disponible, nivel, id  FROM {}".format(tabla))
     objetos = cursor.fetchall()
     con.close()
     return objetos
+
+def eliminarObjeto(tabla, idVar):
+    
+    con = db.connect("perfil.db")
+    cursor = con.cursor()
+    cursor.execute("DELETE FROM {} WHERE id =  ?".format(tabla),[idVar])
+    con.commit()
+    con.close()
+    return "Se eliminó con éxito"
 
 # def obtenerItem(idItem, tabla):
 #     con = db.connect("perfil.db")
@@ -251,6 +269,7 @@ Se recomienda crear la lista con más de 10 objetos.
         iniciarBoton.config(state = "normal", command = lambda x = idVar: iniciarPag(x))
 
 def verLista(idVar):
+    print(idVar)
     global verListaFrame
     paginaInicio.pack_forget()
     #destruirInicio()
@@ -261,6 +280,7 @@ def verLista(idVar):
         datosArray = listaAlfabetica[listaObjetos.curselection()[0]].split("/#IDINVISIBLE#/")[1]
         detalleTexto = listaAlfabetica[listaObjetos.curselection()[0]].split("/#IDINVISIBLE#/")[0].split("=")[0]
         detalleDefinicion = listaAlfabetica[listaObjetos.curselection()[0]].split("/#IDINVISIBLE#/")[0].split("=")[1]
+        detalleID = datosArray.split(",")[0]
         detalleDescripcion = datosArray.split(",")[1]
         detalleDisponible = int(datosArray.split(",")[2])
         detalleNivel = int(datosArray.split(",")[3])
@@ -296,8 +316,11 @@ def verLista(idVar):
         btnEliminar.config(state = "normal")
         btnEditarDes.config(state = "normal")
 
+
+        btnEliminar.config(command = lambda : eliminarObjeto(obtenerTabla(idVar), detalleID))
+
     objetosArray = []
-    objetosArray = objetosTabla(obtenerTabla(idVar))
+    objetosArray = todosObjetosTabla(obtenerTabla(idVar))
 
     
     verListaFrame = tk.Frame(window)
