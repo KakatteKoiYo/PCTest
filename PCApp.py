@@ -4,7 +4,7 @@ import tkinter as tk
 import sqlite3 as db
 import os.path as fs
 import random, time
-from turtle import bgcolor, color
+from tkinter import messagebox
 
 
 window = tk.Tk()
@@ -144,14 +144,21 @@ def nivelar(nivel, tabla, opcion, idItem):
         nivel = nivel - 1
     if nivel > 10:
         nivel = 10
-    if nivel < 0:
-        nivel = 0
+    if nivel < 1:
+        nivel = 1
     con = db.connect("perfil.db")
     cursor = con.cursor()
     cursor.execute("UPDATE {} SET nivel = ? where id = ?".format(tabla), (nivel, idItem))
     con.commit()
     con.close()
     #return "Se actualizó la base de datos"
+
+def activarDesactivarSQL(tabla, valor, idVar):
+    con = db.connect("perfil.db")
+    cursor = con.cursor()
+    cursor.execute("UPDATE {} SET disponible = ? WHERE id = ?".format(tabla), (valor, idVar))
+    con.commit()
+    con.close()
 
 
 def crearListaSQL(nombreTabla, nombreLista, listaObjetos):
@@ -174,6 +181,7 @@ def crearListaSQL(nombreTabla, nombreLista, listaObjetos):
 def generarLista():
     listaCompleta = campoDatos.get("1.0",tk.END)
     listaArray = []
+    listaRechazada = []
     try:
         listaDividida = [x for x in listaCompleta.split("\n") if x]
         listaCompleta = len(listaDividida)
@@ -181,14 +189,24 @@ def generarLista():
         for i in listaDividida:
             if i != "" and "=" in i and len(i.split("=")) == 2:
                 listaArray.append(i.split("="))
+            else:
+                listaRechazada.append(i)
 
-        
-        formNuevaLista(listaArray)
+        if len(listaArray) < 10:
+            messagebox.showinfo(title="Error", message="Debe haber más de diez objetos válidos en la lista")
+        else:
+            if listaCompleta == len(listaArray):
+                formNuevaLista(listaArray)
+            else:
+                #diferencia = (listaCompleta - len(listaArray))
+                #messagebox.showinfo(title = "Atención", message = "{} objetos no pudieron agregarse a la lista\n Los puede agregar más tarde a la lista creada".format(diferencia)) 
+                formNuevaLista(listaArray, listaRechazada)
+
         
     except Exception as e:
         print(e)
 
-def pantallaInicio():
+def pantallaInicio(rechazadosArray = None):
     global paginaInicio, lista, campoDatos, campoEjemplo, camposFrame
     
     idArray = []
@@ -199,6 +217,12 @@ def pantallaInicio():
     camposFrame.pack()
     campoDatos = tk.Text(camposFrame, bg = "azure")
     campoDatos.pack(side = tk.LEFT)
+
+    if rechazadosArray != None:
+        campoDatos.insert(tk.END, "Los siguientes elementos no pudieron agregarse, revise el formato: \n")
+        for rechazado in rechazadosArray:
+            campoDatos.insert(tk.END, rechazado + "\n")
+
     campoEjemplo = tk.Text(camposFrame, width = 70)
     campoEjemplo.insert(tk.INSERT, """
 EXPLICACIÓN:
@@ -220,7 +244,7 @@ Recuerda, sólo debe haber un signo de igualdad (=) por linea,
 cualquier linea que no cumpla con texto1 = texto2 será ignorada.
 El texto de cualquier lado puede llevar espacios o signos 
 que sean diferentes al signo de igualdad (=).
-Se recomienda crear la lista con más de 10 objetos. 
+Se debe crear la lista con mínimo 10 objetos. 
 """)
     campoEjemplo.config(state = "disabled")
     campoEjemplo.pack(side = tk.LEFT)
@@ -268,18 +292,38 @@ Se recomienda crear la lista con más de 10 objetos.
         verListaBoton.config(state = "normal", command = lambda x = idVar: verLista(x))
         iniciarBoton.config(state = "normal", command = lambda x = idVar: iniciarPag(x))
 
-def verLista(idVar):
+def verLista(idVar, seleccion = None):
     print(idVar)
     global verListaFrame
+    tablaActual = obtenerTabla(idVar)
     paginaInicio.pack_forget()
     #destruirInicio()
+
+
+
     def mayus(e):
         return e.upper()
     def mostrarDetalles(e):
 
-        datosArray = listaAlfabetica[listaObjetos.curselection()[0]].split("/#IDINVISIBLE#/")[1]
-        detalleTexto = listaAlfabetica[listaObjetos.curselection()[0]].split("/#IDINVISIBLE#/")[0].split("=")[0]
-        detalleDefinicion = listaAlfabetica[listaObjetos.curselection()[0]].split("/#IDINVISIBLE#/")[0].split("=")[1]
+        seleccionID = listaObjetos.curselection()[0]
+        def eliminar():
+            respuesta = messagebox.askyesno("Cuidado", "¿Seguro que desea borrar este objeto?")
+            if respuesta == True:
+                eliminarObjeto(tablaActual, detalleID)
+                salirLista()
+                verLista(idVar)
+            else:
+                return
+
+        def cambiarDisponible(valor):
+            activarDesactivarSQL(tablaActual, valor, detalleID)
+            salirLista()
+            verLista(idVar, seleccionID)
+
+
+        datosArray = listaAlfabetica[seleccionID].split("/#IDINVISIBLE#/")[1]
+        detalleTexto = listaAlfabetica[seleccionID].split("/#IDINVISIBLE#/")[0].split("=")[0]
+        detalleDefinicion = listaAlfabetica[seleccionID].split("/#IDINVISIBLE#/")[0].split("=")[1]
         detalleID = datosArray.split(",")[0]
         detalleDescripcion = datosArray.split(",")[1]
         detalleDisponible = int(datosArray.split(",")[2])
@@ -315,12 +359,20 @@ def verLista(idVar):
         btnEnTest.config(state = "normal")
         btnEliminar.config(state = "normal")
         btnEditarDes.config(state = "normal")
+        print(detalleDisponible)
+        if detalleDisponible == 1:
+            btnEnTest.config(text = "Desactivar en test", command = lambda: cambiarDisponible(0))
+            
+        if detalleDisponible == 0:
+            btnEnTest.config(text = "Activar en test", command = lambda: cambiarDisponible(1))
+            
+
+        btnEliminar.config(command = eliminar)
 
 
-        btnEliminar.config(command = lambda : eliminarObjeto(obtenerTabla(idVar), detalleID))
 
     objetosArray = []
-    objetosArray = todosObjetosTabla(obtenerTabla(idVar))
+    objetosArray = todosObjetosTabla(tablaActual)
 
     
     verListaFrame = tk.Frame(window)
@@ -383,6 +435,12 @@ def verLista(idVar):
         nivelSimbol = "|" + ("·"*int(elemento.split("/#IDINVISIBLE#/")[1].split(",")[3])) + "|" if int(elemento.split("/#IDINVISIBLE#/")[1].split(",")[3]) > 0 else ""
         listaObjetos.insert(tk.END, elemento.split("/#IDINVISIBLE#/")[0] + " " + nivelSimbol)
     
+    if seleccion != None:
+        listaObjetos.selection_set(seleccion)
+        listaObjetos.activate(seleccion)
+        mostrarDetalles("<<ListboxSelect>>")
+    listaObjetos.focus()
+
 def iniciarPag(idVar, numPreguntas = 20):
     
     global paginaTest, contador, resultadoLista, numeroCorrectas #numPreguntasGlobal
@@ -569,7 +627,7 @@ def generarNombreTabla():
     nombreNuevoTabla = "tabla" + str(numeroUltimaTabla + 1)
     return nombreNuevoTabla
 
-def formNuevaLista(listaArray):
+def formNuevaLista(listaArray, rechazadosArray = None):
     
     def crear():
         
@@ -583,7 +641,10 @@ def formNuevaLista(listaArray):
             print(mensaje)
             ventanaConfirmacion.destroy()
             destruirInicio()
-            pantallaInicio()
+            if rechazadosArray != None:
+                pantallaInicio(rechazadosArray)
+            else:
+                pantallaInicio()
     
     x = window.winfo_rootx()
     y = window.winfo_rooty()
@@ -621,7 +682,6 @@ def salirLista():
         l.destroy()
     verListaFrame.destroy()
     paginaInicio.pack(fill = "both", expand = True)
-
     
 def mostrar():
     print(lista.curselection())
@@ -636,7 +696,6 @@ def destruirResultado(idVar = "", salir = 1):
     else:
         iniciarPag(idVar)
 
-
 def destruirInicio():
     list = paginaInicio.winfo_children()
     for l in list:
@@ -649,7 +708,6 @@ def destruirTestInicio():
         l.destroy()
     paginaTest.destroy()
     paginaTest.destroy()
-
 
 pantallaInicio()
 window.mainloop()
