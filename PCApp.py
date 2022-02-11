@@ -1,5 +1,6 @@
 from cgitb import text
 from glob import glob
+from sre_parse import State
 import tkinter as tk 
 import sqlite3 as db
 import os.path as fs
@@ -130,6 +131,14 @@ def eliminarObjeto(tabla, idVar):
     con.close()
     return "Se eliminó con éxito"
 
+def eliminarTabla(tabla, idVar):
+    con = db.connect("perfil.db")
+    cursor = con.cursor()
+    cursor.execute("DROP TABLE {}".format(tabla))
+    cursor.execute("DELETE FROM nombreslista WHERE id = ?", [idVar])
+    con.commit()
+    con.close()
+
 # def obtenerItem(idItem, tabla):
 #     con = db.connect("perfil.db")
 #     cursor = con.cursor()
@@ -207,7 +216,7 @@ def generarLista():
         print(e)
 
 def pantallaInicio(rechazadosArray = None):
-    global paginaInicio, lista, campoDatos, campoEjemplo, camposFrame
+    global paginaInicio, lista, campoDatos, campoEjemplo, camposFrame, valorNumPreg, valorModo
     
     idArray = []
     nombreArray = []
@@ -219,7 +228,7 @@ def pantallaInicio(rechazadosArray = None):
     campoDatos.pack(side = tk.LEFT)
 
     if rechazadosArray != None:
-        campoDatos.insert(tk.END, "Los siguientes elementos no pudieron agregarse, revise el formato: \n")
+        campoDatos.insert(tk.END, "Los siguientes elementos no pudieron agregarse, No cumplen con el formato: \n")
         for rechazado in rechazadosArray:
             campoDatos.insert(tk.END, rechazado + "\n")
 
@@ -278,19 +287,82 @@ Se debe crear la lista con mínimo 10 objetos.
 
     verListaBoton = tk.Button(paginaInicio, text = "Ver lista", font = ("Arial ", 10), state = "disabled" )
     verListaBoton.place(x = 400, y = 550)
+
+    eliminarListaBoton = tk.Button(paginaInicio, text = "Eliminar lista", font = ("Arial ", 10), state = "disabled")
+    eliminarListaBoton.place(x = 480, y = 550)
+    
+
+    radioNumFrame = tk.LabelFrame(paginaInicio)
+    radioNumFrame.place(x = 870, y = 500)
+
+    valorPregLabel = tk.Label(radioNumFrame, text = "Cantidad de preguntas", font = ("Arial ", 10))
+    valorPregLabel.pack()
+
+    valorNumPreg = tk.IntVar()
+    
+    rdNumPreg = tk.Radiobutton(radioNumFrame, text = "10", variable = valorNumPreg, font = ("Arial ", 10), borderwidth = 10,
+                        value = 10)
+    rdNumPreg.pack(side = tk.LEFT)
+    rdNumPreg.select()
+
+    rdNumPreg2 = tk.Radiobutton(radioNumFrame, text = "20", variable = valorNumPreg, font = ("Arial ", 10),
+                        value = 20)
+    rdNumPreg2.pack(side = tk.LEFT)
+
+    rdNumPreg3 = tk.Radiobutton(radioNumFrame, text = "30", variable = valorNumPreg, font = ("Arial ", 10),
+                        value = 30)
+    rdNumPreg3.pack(side = tk.LEFT)
+
+    radioModoFrame = tk.LabelFrame(paginaInicio)
+    radioModoFrame.place(x = 1040, y = 465)
+
+    valorModo = tk.IntVar()
+    
+    modoLabel = tk.Label(radioModoFrame, text ="Pregunta principal", font = ("Arial ", 10))
+    modoLabel.pack()
+
+    rdModo = tk.Radiobutton(radioModoFrame, text = "Ambos", variable = valorModo, font = ("Arial ", 10), 
+                       value = 0)
+    rdModo.pack(anchor=tk.W)
+    rdModo.select()
+    
+
+    rdModo2 = tk.Radiobutton(radioModoFrame, text = "Texto", variable = valorModo, font = ("Arial ", 10),
+                        value = 1)
+    rdModo2.pack(anchor=tk.W)
+
+    rdModo3 = tk.Radiobutton(radioModoFrame, text = "Definición", variable = valorModo, font = ("Arial ", 10),
+                        value = 2)
+    rdModo3.pack(anchor=tk.W)
+    
+
+
     iniciarBoton = tk.Button(paginaInicio, text = "Iniciar", width = 15, font = ("Arial ", 20), state = "disabled")
-    iniciarBoton.place(x = 900, y = 500)
+    iniciarBoton.place(x = 900, y = 600)
 
 
     def cargar():
-        idVar = idArray[lista.curselection()[0]]
-        campoCargado.config(state = "normal")
-        campoCargado.delete('1.0',tk.END)
-        campoCargado.insert(tk.END, nombreArray[lista.curselection()[0]])
-        campoCargado.config(state = "disabled")
+        try: 
+            idVar = idArray[lista.curselection()[0]]
+            campoCargado.config(state = "normal")
+            campoCargado.delete('1.0',tk.END)
+            campoCargado.insert(tk.END, nombreArray[lista.curselection()[0]])
+            campoCargado.config(state = "disabled")
 
-        verListaBoton.config(state = "normal", command = lambda x = idVar: verLista(x))
-        iniciarBoton.config(state = "normal", command = lambda x = idVar: iniciarPag(x))
+            verListaBoton.config(state = "normal", command = lambda x = idVar: verLista(x))
+            iniciarBoton.config(state = "normal", command = lambda x = idVar: iniciarPag(x, valorNumPreg.get(), valorModo.get()))
+            eliminarListaBoton.config(state = "normal", command = lambda x = idVar: eliminarLista(x, campoCargado.get("1.0",tk.END)) )
+        except:
+            pass
+
+
+def eliminarLista(idVar, nombre):
+    respuesta = messagebox.askyesno(title = "Atención", message = "¿Seguro que desea eliminar la lista \n'{}'?".format(nombre.strip()))
+    if respuesta == True:
+        eliminarTabla(obtenerTabla(idVar), idVar)
+        destruirInicio()
+        pantallaInicio()
+
 
 def verLista(idVar, seleccion = None):
     print(idVar)
@@ -404,7 +476,7 @@ def verLista(idVar, seleccion = None):
     botonesFrame = tk.Frame(detallesFrame, bg = colorFondoTest)
     botonesFrame.pack()
 
-    btnEnTest = tk.Button(botonesFrame, text = "Desactivar en test" , state ="disabled", bg = colorFondoTest, fg = colorLetraTest, font = ("Arial ", 17))
+    btnEnTest = tk.Button(botonesFrame, text = "Desactivar en test" , width = 15, state ="disabled", bg = colorFondoTest, fg = colorLetraTest, font = ("Arial ", 17))
     btnEnTest.grid(column = 0, row = 0)
 
     btnEliminar = tk.Button(botonesFrame, text = "Eliminar de lista" , state ="disabled", bg = colorFondoTest, fg = colorLetraTest, font = ("Arial ", 17))
@@ -441,9 +513,10 @@ def verLista(idVar, seleccion = None):
         mostrarDetalles("<<ListboxSelect>>")
     listaObjetos.focus()
 
-def iniciarPag(idVar, numPreguntas = 20):
+def iniciarPag(idVar, numPreguntas, modoPreguntas):
     
     global paginaTest, contador, resultadoLista, numeroCorrectas #numPreguntasGlobal
+    print(valorNumPreg.get())
     #numPreguntasGlobal = numPreguntas
     tablaActual = obtenerTabla(idVar)
     objetosArray = objetosTabla(tablaActual)
@@ -479,7 +552,21 @@ def iniciarPag(idVar, numPreguntas = 20):
         testInterfazFrame.pack()
         randomPregunta = random.randint(0, len(objetosArray)-1)
 
-        palabraPrincipal = objetosArray[randomPregunta][0]
+        if modoPreguntas == 0:
+            p = random.randint(0, 1)
+            if p == 0:
+                r = 1
+            else:
+                r = 0
+        if modoPreguntas == 1:
+            p = 0
+            r = 1
+        if modoPreguntas == 2:
+            p = 1
+            r = 0
+
+
+        palabraPrincipal = objetosArray[randomPregunta][p]
         nivelPrincipal = int(objetosArray[randomPregunta][4])
         idPrincipal = objetosArray[randomPregunta][5]
         palabraPrincipalAncho = len(palabraPrincipal)
@@ -487,7 +574,7 @@ def iniciarPag(idVar, numPreguntas = 20):
         palabraPrincipalLabel.pack(pady = 90)
 
         contador += 1
-        print(contador)
+        #print(contador)
         lugarRespuesta = random.randint(0, 4)
         for i in range(5):
             while True:
@@ -498,9 +585,9 @@ def iniciarPag(idVar, numPreguntas = 20):
                     numerosGenerados.append(numeroRandom)
                     break
             if i == lugarRespuesta:
-                opciones.append(objetosArray[randomPregunta][1])
+                opciones.append(objetosArray[randomPregunta][r])
             else:
-                opciones.append(objetosArray[numeroRandom][1])
+                opciones.append(objetosArray[numeroRandom][r])
 
         numerosGenerados = []
 
@@ -623,9 +710,12 @@ def mostrarPaginaResultado(porcentaje, resultadoArray, idVar):
     # listaCorrectas.pack()
 
 def generarNombreTabla():
-    numeroUltimaTabla = int(obtenerUltimaTabla().split("tabla")[1])
-    nombreNuevoTabla = "tabla" + str(numeroUltimaTabla + 1)
-    return nombreNuevoTabla
+    try:
+        numeroUltimaTabla = int(obtenerUltimaTabla().split("tabla")[1])
+        nombreNuevoTabla = "tabla" + str(numeroUltimaTabla + 1)
+        return nombreNuevoTabla
+    except: 
+        return "tabla1"
 
 def formNuevaLista(listaArray, rechazadosArray = None):
     
@@ -692,9 +782,9 @@ def destruirResultado(idVar = "", salir = 1):
         l.destroy()
     resultadoFrame.destroy()
     if salir == 1:
-        pantallaInicio()
+        paginaInicio.pack(fill = "both", expand = True)
     else:
-        iniciarPag(idVar)
+        iniciarPag(idVar, valorNumPreg.get(), valorModo.get())
 
 def destruirInicio():
     list = paginaInicio.winfo_children()
