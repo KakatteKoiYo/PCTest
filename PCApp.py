@@ -1,18 +1,28 @@
-from cgitb import text
-from glob import glob
-from sre_parse import State
 import tkinter as tk 
 import sqlite3 as db
 import os.path as fs
-import random, time
+import random, time, os, sys
 from tkinter import messagebox
 
 
 window = tk.Tk()
 window.geometry("1200x700")
-
+window.resizable(False, False)
+window.title("CustomTest App")
 colorFondoTest = "black"
 colorLetraTest = "white"
+
+
+
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+window.iconbitmap(resource_path("testIcon.ico"))
 
 def conexionBaseDatos():
     if fs.exists("perfil.db"):
@@ -89,7 +99,6 @@ def conexionBaseDatos():
 
         return rows
 
-
 def obtenerTabla(idVar):
     con = db.connect("perfil.db")
     cursor = con.cursor()
@@ -123,7 +132,6 @@ def todosObjetosTabla(tabla):
     return objetos
 
 def eliminarObjeto(tabla, idVar):
-    
     con = db.connect("perfil.db")
     cursor = con.cursor()
     cursor.execute("DELETE FROM {} WHERE id =  ?".format(tabla),[idVar])
@@ -166,6 +174,14 @@ def activarDesactivarSQL(tabla, valor, idVar):
     con = db.connect("perfil.db")
     cursor = con.cursor()
     cursor.execute("UPDATE {} SET disponible = ? WHERE id = ?".format(tabla), (valor, idVar))
+    con.commit()
+    con.close()
+
+def agregarNuevosElementosSQL(tabla, array ):
+    con = db.connect("perfil.db")
+    cursor = con.cursor()
+    for palabra1, palabra2 in array:
+        cursor.execute("INSERT INTO {} (palabra1, palabra2) VALUES(?,?)".format(tabla), (palabra1, palabra2))
     con.commit()
     con.close()
 
@@ -217,14 +233,14 @@ def generarLista():
 
 def pantallaInicio(rechazadosArray = None):
     global paginaInicio, lista, campoDatos, campoEjemplo, camposFrame, valorNumPreg, valorModo
-    fondoPaginaInicial = "black"
-    letraPaginaInicial  = "white"
+    # fondoPaginaInicial = "black"
+    # "white"  = "white"
     
     idArray = []
     nombreArray = []
-    paginaInicio = tk.Frame(window, bg = fondoPaginaInicial)
+    paginaInicio = tk.Frame(window)
     paginaInicio.pack(fill = "both", expand = True)
-    camposFrame = tk.Frame(paginaInicio, bg = fondoPaginaInicial)
+    camposFrame = tk.Frame(paginaInicio)
     camposFrame.pack()
     campoDatos = tk.Text(camposFrame, bg = "lightgray")
     campoDatos.pack(side = tk.LEFT)
@@ -234,7 +250,7 @@ def pantallaInicio(rechazadosArray = None):
         for rechazado in rechazadosArray:
             campoDatos.insert(tk.END, rechazado + "\n")
 
-    campoEjemplo = tk.Text(camposFrame, width = 70, bg = fondoPaginaInicial, fg = letraPaginaInicial)
+    campoEjemplo = tk.Text(camposFrame, width = 70, bg = "lightgray")
     campoEjemplo.insert(tk.INSERT, """
 EXPLICACIÓN:
 En el campo de la izquierda debe haber una lista obedeciendo
@@ -260,12 +276,12 @@ Se debe crear la lista con mínimo 10 objetos.
     campoEjemplo.config(state = "disabled")
     campoEjemplo.pack(side = tk.LEFT)
 
-    cargarFrame = tk.Frame(paginaInicio, bg = fondoPaginaInicial)
+    cargarFrame = tk.Frame(paginaInicio)
     cargarFrame.pack(fill = "x")
-    botonCrear = tk.Button(cargarFrame, text = "Crear lista", width = 58 , font = ("Arial ", 15), command = generarLista, bg = fondoPaginaInicial, fg = letraPaginaInicial, relief = tk.RIDGE)
+    botonCrear = tk.Button(cargarFrame, text = "Crear lista", width = 58 , font = ("Arial ", 15), command = generarLista)
     botonCrear.pack(side = tk.LEFT )
 
-    listaLabel = tk.Label(paginaInicio, text = "Seleccionar lista", font = ("Arial ", 20), bg = fondoPaginaInicial, fg = letraPaginaInicial)
+    listaLabel = tk.Label(paginaInicio, text = "Seleccionar lista", font = ("Arial ", 20))
     listaLabel.place(x = 10, y = 450)
 
     lista = tk.Listbox(paginaInicio, width = 60, bg = "lightgray")
@@ -279,69 +295,68 @@ Se debe crear la lista con mínimo 10 objetos.
         lista.insert(tk.END, nombreLista[1])
 
 
-    miListaBoton = tk.Button(paginaInicio, text = "Cargar lista seleccionada", width = 32, font = ("Arial ", 15), command = lambda : cargar(), bg = fondoPaginaInicial, fg = letraPaginaInicial
-    , relief = tk.RIDGE)
+    miListaBoton = tk.Button(paginaInicio, text = "Cargar lista seleccionada", width = 32, font = ("Arial ", 15), command = lambda : cargar())
     miListaBoton.place(x = 10, y = 660)
 
-    labelCargado =tk.Label(paginaInicio, text = "Lista: ", bg = fondoPaginaInicial, fg = letraPaginaInicial)
+    labelCargado =tk.Label(paginaInicio, text = "Lista: ")
     labelCargado.place(x = 400, y = 500)
     campoCargado = tk.Text(paginaInicio, width = 30, height = 1, state = "disabled", bg = "lightgray")
     campoCargado.place(x = 450, y = 500)
 
-    verListaBoton = tk.Button(paginaInicio, text = "Ver lista", font = ("Arial ", 10), state = "disabled", bg = fondoPaginaInicial, fg = letraPaginaInicial, relief = tk.RIDGE )
+    verListaBoton = tk.Button(paginaInicio, text = "Ver lista", font = ("Arial ", 10), state = "disabled" )
     verListaBoton.place(x = 400, y = 550)
 
-    eliminarListaBoton = tk.Button(paginaInicio, text = "Eliminar lista", font = ("Arial ", 10), state = "disabled", bg = fondoPaginaInicial, fg = letraPaginaInicial, relief = tk.RIDGE)
+    eliminarListaBoton = tk.Button(paginaInicio, text = "Eliminar lista", font = ("Arial ", 10), state = "disabled")
     eliminarListaBoton.place(x = 480, y = 550)
     
 
-    radioNumFrame = tk.LabelFrame(paginaInicio, bg = fondoPaginaInicial)
+    radioNumFrame = tk.LabelFrame(paginaInicio)
     radioNumFrame.place(x = 870, y = 500)
 
-    valorPregLabel = tk.Label(radioNumFrame, text = "Cantidad de preguntas", font = ("Arial ", 10), bg = fondoPaginaInicial, fg = letraPaginaInicial)
+    valorPregLabel = tk.Label(radioNumFrame, text = "Cantidad de preguntas", font = ("Arial ", 10))
     valorPregLabel.pack()
 
     valorNumPreg = tk.IntVar()
     
     rdNumPreg = tk.Radiobutton(radioNumFrame, text = "10", variable = valorNumPreg, font = ("Arial ", 10), borderwidth = 10,
-                        value = 10, bg = fondoPaginaInicial, fg = letraPaginaInicial, selectcolor = "dimgrey")
+                        value = 10)
     rdNumPreg.pack(side = tk.LEFT)
     rdNumPreg.select()
 
     rdNumPreg2 = tk.Radiobutton(radioNumFrame, text = "20", variable = valorNumPreg, font = ("Arial ", 10),
-                        value = 20, bg = fondoPaginaInicial, fg = letraPaginaInicial, selectcolor = "dimgrey")
+                        value = 20)
     rdNumPreg2.pack(side = tk.LEFT)
 
     rdNumPreg3 = tk.Radiobutton(radioNumFrame, text = "30", variable = valorNumPreg, font = ("Arial ", 10),
-                        value = 30, bg = fondoPaginaInicial, fg = letraPaginaInicial, selectcolor = "dimgrey")
+                        value = 30)
     rdNumPreg3.pack(side = tk.LEFT)
 
-    radioModoFrame = tk.LabelFrame(paginaInicio, bg = fondoPaginaInicial)
+    radioModoFrame = tk.LabelFrame(paginaInicio)
     radioModoFrame.place(x = 1040, y = 465)
 
     valorModo = tk.IntVar()
     
-    modoLabel = tk.Label(radioModoFrame, text ="Pregunta principal", font = ("Arial ", 10), bg = fondoPaginaInicial, fg = letraPaginaInicial)
+    modoLabel = tk.Label(radioModoFrame, text ="Pregunta principal", font = ("Arial ", 10))
     modoLabel.pack()
 
     rdModo = tk.Radiobutton(radioModoFrame, text = "Ambos", variable = valorModo, font = ("Arial ", 10), 
-                       value = 0, bg = fondoPaginaInicial, fg = letraPaginaInicial, selectcolor = "dimgrey")
+                       value = 0)
     rdModo.pack(anchor=tk.W)
     rdModo.select()
     
 
     rdModo2 = tk.Radiobutton(radioModoFrame, text = "Texto", variable = valorModo, font = ("Arial ", 10),
-                        value = 1, bg = fondoPaginaInicial, fg = letraPaginaInicial, selectcolor = "dimgrey")
+                        value = 1)
     rdModo2.pack(anchor=tk.W)
 
     rdModo3 = tk.Radiobutton(radioModoFrame, text = "Definición", variable = valorModo, font = ("Arial ", 10),
-                        bg = fondoPaginaInicial, fg = letraPaginaInicial, value = 2, selectcolor = "dimgrey")
+                         value = 2)
     rdModo3.pack(anchor=tk.W)
     
 
 
     iniciarBoton = tk.Button(paginaInicio, text = "Iniciar", width = 15, font = ("Arial ", 20), state = "disabled"
-    , bg = "indigo", fg = letraPaginaInicial)
+    , bg = "indigo", fg = "white")
     iniciarBoton.place(x = 900, y = 600)
 
 
@@ -446,14 +461,53 @@ def verLista(idVar, seleccion = None):
 
 
     def mostrarAgregar():
+        global agregarFrame, campoAgregar
+        agregarFrame = tk.Frame(leftSide, bg = "azure")
         agregarFrame.place(x = 0, y = 30)
+
+        campoAgregar = tk.Text(agregarFrame, bg = "lightgray", height = 10, width = 50)
+        campoAgregar.pack(pady = 10, padx = 10)
+
+        botonesAgregarFrame = tk.Frame(agregarFrame)
+        botonesAgregarFrame.pack(fill = "both", expand = True)
+
+        btnConfirmar = tk.Button(botonesAgregarFrame, text = "Agregar", command = agregarNuevo)
+        btnConfirmar.pack(side = tk.LEFT, fill = "both", expand = True)
+
+        btnCancelar = tk.Button(botonesAgregarFrame, text = "Cancelar", command = cerrarAgregar)
+        btnCancelar.pack(side = tk.LEFT, fill = "both", expand = True)
         btnAgregarNuevos.config(state = "disabled")
 
     def cerrarAgregar():
         agregarFrame.destroy()
         btnAgregarNuevos.config(state = "normal")
 
+    def agregarNuevo():
+        listaCompleta = campoAgregar.get("1.0",tk.END)
+        listaArray = []
+        listaRechazada = []
+   
+        listaDividida = [x for x in listaCompleta.split("\n") if x]
+        listaCompleta = len(listaDividida)
+        print(listaCompleta)
+        for i in listaDividida:
+            if i != "" and "=" in i and len(i.split("=")) == 2:
+                listaArray.append(i.split("="))
+            else:
+                listaRechazada.append(i)
 
+        if len(listaArray) != 0 and listaCompleta == len(listaArray):
+            agregarNuevosElementosSQL(tablaActual, listaArray)
+            messagebox.showinfo(title = "", message = "Se agregarón con éxito") 
+        else:
+            #diferencia = listaCompleta - len(listaArray)
+            messagebox.showinfo(title = "Atención", message = "Sólo se agregaron {} objetos de {}".format(len(listaArray), listaCompleta)) 
+            if len(listaArray) != 0:
+                agregarNuevosElementosSQL(tablaActual, listaArray)
+               
+        cerrarAgregar()
+        salirLista()
+        verLista(idVar)
 
     objetosArray = []
     objetosArray = todosObjetosTabla(tablaActual)
@@ -472,20 +526,7 @@ def verLista(idVar, seleccion = None):
     listaObjetos = tk.Listbox(leftSide, width= 100, height = 40, bg = "lightgray")
     listaObjetos.pack()
 
-    agregarFrame = tk.Frame(leftSide, bg = "azure")
     
-
-    campoAgregar = tk.Text(agregarFrame, bg = "lightgray", height = 10, width = 50)
-    campoAgregar.pack(pady = 10, padx = 10)
-
-    botonesAgregarFrame = tk.Frame(agregarFrame)
-    botonesAgregarFrame.pack(fill = "both", expand = True)
-
-    btnConfirmar = tk.Button(botonesAgregarFrame, text = "Agregar")
-    btnConfirmar.pack(side = tk.LEFT, fill = "both", expand = True)
-
-    btnCancelar = tk.Button(botonesAgregarFrame, text = "Cancelar", command = cerrarAgregar)
-    btnCancelar.pack(side = tk.LEFT, fill = "both", expand = True)
 
 
     btnSalir = tk.Button(leftSide, text = "Salir", command = salirLista)
@@ -552,6 +593,10 @@ def iniciarPag(idVar, numPreguntas, modoPreguntas):
     #numPreguntasGlobal = numPreguntas
     tablaActual = obtenerTabla(idVar)
     objetosArray = objetosTabla(tablaActual)
+    if len(objetosArray) < 10:
+         messagebox.showinfo(title = "Atención", message = "Se necesitan más de 10 elementos para iniciar el test\n Verifica que no engas elementos desactivados en test")
+         return
+
     resultadoLista = ""
     resultadoListaArray = []
     paginaInicio.pack_forget()
@@ -668,8 +713,8 @@ def iniciarPag(idVar, numPreguntas, modoPreguntas):
                     resultadosLabel.config(text= resultadoLista)
                     nivelar(nivelPrincipal, tablaActual, 1, idPrincipal)
                 else:
-                    resultadoListaArray.append(("[X] {} = {}".format(palabraPrincipal, opciones[x]),0,palabraPrincipal, opciones[lugarRespuesta]))
-                    resultadoLista = resultadoLista + "X {0} = {1} -> O {2} = {3} \n".format(palabraPrincipal, opciones[x], palabraPrincipal, opciones[lugarRespuesta])
+                    resultadoListaArray.append(("[X] {} ≠ {}".format(palabraPrincipal, tachar(opciones[x])),0,palabraPrincipal, opciones[lugarRespuesta]))
+                    resultadoLista = resultadoLista + "X {0} ≠ {1} -> O {2} = {3} \n".format(palabraPrincipal, opciones[x], palabraPrincipal, opciones[lugarRespuesta])
                     resultadosLabel.config(text= resultadoLista)
                     nivelar(nivelPrincipal, tablaActual, 0, idPrincipal)
                 iniciarTest()
@@ -748,6 +793,14 @@ def generarNombreTabla():
         return nombreNuevoTabla
     except: 
         return "tabla1"
+
+def tachar(texto):
+    result = ''
+    for c in texto:
+        result = result + c + '\u0336'
+    return result
+
+
 
 def formNuevaLista(listaArray, rechazadosArray = None):
     
