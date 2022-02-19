@@ -4,25 +4,26 @@ import os.path as fs
 import random, time, os, sys
 from tkinter import messagebox
 
+colorFondoTest = "black"
+colorLetraTest = "white"
+
 
 window = tk.Tk()
 window.geometry("1200x700")
 window.resizable(False, False)
 window.title("CustomTest App")
-colorFondoTest = "black"
-colorLetraTest = "white"
 
 
 
-def resource_path(relative_path):
-    try:
-        base_path = sys._MEIPASS
-    except:
-        base_path = os.path.abspath(".")
+# def resource_path(relative_path):
+#     try:
+#         base_path = sys._MEIPASS
+#     except:
+#         base_path = os.path.abspath(".")
 
-    return os.path.join(base_path, relative_path)
+#     return os.path.join(base_path, relative_path)
 
-window.iconbitmap(resource_path("testIcon.ico"))
+# window.iconbitmap(resource_path("testIcon.ico"))
 
 def conexionBaseDatos():
     if fs.exists("perfil.db"):
@@ -35,6 +36,7 @@ def conexionBaseDatos():
         con.close()
         return rows
     else:
+        #Si no existe perfil.db lo crea y agrega una lista por default
         con = db.connect("perfil.db")
         cursor = con.cursor()
         cursor.execute("CREATE TABLE tabla1(id integer PRIMARY KEY, palabra1 text, palabra2 text, descripcion text DEFAULT 'Descripción no disponible', disponible integer DEFAULT 1 NOT NULL, nivel integer DEFAULT 0 NOT NULL)")
@@ -154,6 +156,7 @@ def eliminarTabla(tabla, idVar):
 #     objetoEspecifico = cursor.fetchall()
 #     con.close()
 #     return objetoEspecifico
+
 def nivelar(nivel, tabla, opcion, idItem):
     if opcion == 1:
         nivel = nivel + 1
@@ -184,7 +187,6 @@ def agregarNuevosElementosSQL(tabla, array ):
         cursor.execute("INSERT INTO {} (palabra1, palabra2) VALUES(?,?)".format(tabla), (palabra1, palabra2))
     con.commit()
     con.close()
-
 
 def crearListaSQL(nombreTabla, nombreLista, listaObjetos):
     try:
@@ -238,26 +240,87 @@ def pantallaInicio(rechazadosArray = None):
     
     idArray = []
     nombreArray = []
+
+    def focus1(e):
+        input2.configure(state = "disabled")
+        labelPalabra2.configure(state = "disabled")
+        labelPalabra1.configure(state = "normal")
+        
+    def backSpace(e):
+        if input2.get() == "":
+            input1.focus()
+
+
+
+
+    def enter1(e):
+        if input1.get().strip() == "":
+            return
+        input2.configure(state = "normal")
+        input2.focus()
+        labelPalabra1.configure(state = "disabled")
+        labelPalabra2.configure(state = "normal")
+        
+    def enter2(e):
+        if input2.get().strip() == "":
+            return
+        campoDatos.insert(tk.END, "{} = {}\n".format(input1.get().strip(), input2.get().strip()))
+        
+        input1.delete("0", tk.END)
+        input2.delete("0", tk.END)
+        input2.configure(state = "disabled")
+        labelPalabra1.configure(state = "normal")
+        labelPalabra2.configure(state = "disabled")
+        input1.focus()
+
     paginaInicio = tk.Frame(window)
     paginaInicio.pack(fill = "both", expand = True)
     camposFrame = tk.Frame(paginaInicio)
     camposFrame.pack()
-    campoDatos = tk.Text(camposFrame, bg = "lightgray")
-    campoDatos.pack(side = tk.LEFT)
 
+
+    inputFrame = tk.Frame(camposFrame, bg = "azure")
+    inputFrame.pack(side = tk.LEFT)
+    
+    fastInputFrame = tk.Frame(inputFrame, bg = "azure")
+    fastInputFrame.pack()
+    labelPalabra1 = tk.Label(fastInputFrame, text= "ENTER ->", bg = "azure")
+    labelPalabra1.grid(column = 0, row = 0)
+    labelPalabra2 = tk.Label(fastInputFrame, text= "ENTER", bg = "azure", state = "disabled")
+    labelPalabra2.grid(column = 2, row = 0)
+    input1 = tk.Entry(fastInputFrame)
+    input1.grid(column = 0, row = 1)
+    input1.bind("<Return>", enter1)
+    input1.bind("<FocusIn>", focus1)
+    tk.Label(fastInputFrame, text= "=", bg = "azure").grid(column = 1, row = 1)
+    input2 = tk.Entry(fastInputFrame, state = "disabled")
+    input2.grid(column = 2, row = 1)
+    input2.bind("<Return>", enter2)
+    input2.bind("<BackSpace>", backSpace)
+
+
+
+    campoDatos = tk.Text(inputFrame, bg = "antiquewhite", height = 21)
+    campoDatos.pack()
+
+ 
     if rechazadosArray != None:
         campoDatos.insert(tk.END, "Los siguientes elementos no pudieron agregarse, No cumplen con el formato: \n")
         for rechazado in rechazadosArray:
             campoDatos.insert(tk.END, rechazado + "\n")
 
-    campoEjemplo = tk.Text(camposFrame, width = 70, bg = "lightgray")
-    campoEjemplo.insert(tk.INSERT, """
-EXPLICACIÓN:
+    ejemploFrame = tk.Frame(camposFrame)
+    ejemploFrame.pack(side = tk.LEFT,expand = True, fill = "y")
+    campoEjemplo = tk.Text(ejemploFrame, width = 70, bg = "lightgray")
+    campoEjemplo.insert(tk.INSERT, """EXPLICACIÓN:
 En el campo de la izquierda debe haber una lista obedeciendo
 el siguiente formato: Que contenga en cada linea una palabra, 
 letra, frase o número seguido de espacio y signo de igualdad (=)
 después de un espacio debe haber algo que represente 
 alguna relación con lo primero.
+Puedes usar los campos de entrada para ingresar automáticamente
+con el formato o utilizar el campo de texto para hacerlo manual.
+
 Ejemplo de formato:
 
 Have they been charting me? = ¿Me han estado rastreando?
@@ -274,7 +337,7 @@ que sean diferentes al signo de igualdad (=).
 Se debe crear la lista con mínimo 10 objetos. 
 """)
     campoEjemplo.config(state = "disabled")
-    campoEjemplo.pack(side = tk.LEFT)
+    campoEjemplo.pack()
 
     cargarFrame = tk.Frame(paginaInicio)
     cargarFrame.pack(fill = "x")
@@ -303,11 +366,11 @@ Se debe crear la lista con mínimo 10 objetos.
     campoCargado = tk.Text(paginaInicio, width = 30, height = 1, state = "disabled", bg = "lightgray")
     campoCargado.place(x = 450, y = 500)
 
-    verListaBoton = tk.Button(paginaInicio, text = "Ver lista", font = ("Arial ", 10), state = "disabled" )
+    verListaBoton = tk.Button(paginaInicio, text = "Estudiar lista", font = ("Arial ", 10), state = "disabled" )
     verListaBoton.place(x = 400, y = 550)
 
     eliminarListaBoton = tk.Button(paginaInicio, text = "Eliminar lista", font = ("Arial ", 10), state = "disabled")
-    eliminarListaBoton.place(x = 480, y = 550)
+    eliminarListaBoton.place(x = 500, y = 550)
     
 
     radioNumFrame = tk.LabelFrame(paginaInicio)
@@ -369,7 +432,7 @@ Se debe crear la lista con mínimo 10 objetos.
             campoCargado.config(state = "disabled")
 
             verListaBoton.config(state = "normal", command = lambda x = idVar: verLista(x))
-            iniciarBoton.config(state = "normal", command = lambda x = idVar: iniciarPag(x, valorNumPreg.get(), valorModo.get()))
+            iniciarBoton.config(state = "normal", command = lambda x = idVar: iniciarTestInput(x, valorNumPreg.get(), valorModo.get()))#iniciarTestPreguntas(x, valorNumPreg.get(), valorModo.get()))
             eliminarListaBoton.config(state = "normal", command = lambda x = idVar: eliminarLista(x, campoCargado.get("1.0",tk.END)) )
         except:
             pass
@@ -523,13 +586,13 @@ def verLista(idVar, seleccion = None):
     btnAgregarNuevos.pack(fill = "both")
 
 
-    listaObjetos = tk.Listbox(leftSide, width= 100, height = 40, bg = "lightgray")
+    listaObjetos = tk.Listbox(leftSide, width= 55, height = 27, bg = "lightgray", font= ("Arial", 15))
     listaObjetos.pack()
 
     
 
 
-    btnSalir = tk.Button(leftSide, text = "Salir", command = salirLista)
+    btnSalir = tk.Button(leftSide, text = "Salir", font= ("Arial", 15), command = salirLista)
     btnSalir.pack(fill = "both")
 
     listaObjetos.bind("<<ListboxSelect>>", mostrarDetalles)
@@ -586,7 +649,160 @@ def verLista(idVar, seleccion = None):
         mostrarDetalles("<<ListboxSelect>>")
     listaObjetos.focus()
 
-def iniciarPag(idVar, numPreguntas, modoPreguntas):
+def iniciarTestInput(idVar, numPreguntas, modoPreguntas):
+    global contadorInput, resultadoListaInput, resultadoListaInputArray, numeroCorrectasInput
+    paginaInicio.pack_forget()
+    #destruirInicio()
+    paginaInputFrame = tk.Frame(window, bg = colorFondoTest)
+    paginaInputFrame.pack(expand = True, fill = "both")
+
+    tablaActual = obtenerTabla(idVar)
+    objetosArray = objetosTabla(tablaActual)
+
+    contadorInput = 0
+    numeroCorrectasInput = 0
+
+    resultadoListaInput = ""
+    resultadoListaInputArray = []
+
+    avanceLabelInput = tk.Label(paginaInputFrame, text = "{}/{}".format(contadorInput,numPreguntas), bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 20))
+    avanceLabelInput.place(x = 1050, y = 30)
+
+    resultadosLabelInput = tk.Label(paginaInputFrame, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 10), justify = "left")
+    resultadosLabelInput.place(x= 20, y = 70)
+
+    botonInputSalir = tk.Button(paginaInputFrame, text = "Abortar", borderwidth=0, bg = colorFondoTest, fg = "grey", font = ("Arial bold", 15)
+    , command = lambda : regresar())
+
+    botonInputSalir.place(x = 100,y = 20)
+
+    def iniciarTest(respuesta = 0):
+        global contadorInput
+        if contadorInput == numPreguntas:
+            porcentaje = (numeroCorrectasInput/numPreguntas)*100
+            mostrarPaginaResultado(porcentaje, resultadoListaInputArray, idVar)
+            return
+        
+       
+        
+        
+        testInterfazInputFrame = tk.Frame(paginaInputFrame, bg = colorFondoTest)
+        testInterfazInputFrame.pack()
+        randomPregunta = random.randint(0, len(objetosArray)-1)
+
+        if modoPreguntas == 0:
+            p = random.randint(0, 1)
+            if p == 0:
+                r = 1
+            else:
+                r = 0
+        if modoPreguntas == 1:
+            p = 0
+            r = 1
+        if modoPreguntas == 2:
+            p = 1
+            r = 0
+
+
+        palabraPrincipal = objetosArray[randomPregunta][p]
+        respuestaCorrecta = objetosArray[randomPregunta][r]
+        nivelPrincipal = int(objetosArray[randomPregunta][4])
+        idPrincipal = objetosArray[randomPregunta][5]
+        palabraPrincipalAncho = len(palabraPrincipal)
+        palabraPrincipalLabel = tk.Label(testInterfazInputFrame, text = palabraPrincipal, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 40), width = palabraPrincipalAncho)
+        palabraPrincipalLabel.pack(pady = 90)
+
+        respuestaInput = tk.Entry(testInterfazInputFrame,  font = ("Arial bold",30), justify='center')
+        respuestaInput.pack()
+        respuestaInput.focus()
+
+        respuestaInput.bind("<Return>", lambda e = "<Return>": verificarRespuesta(e))
+
+        btnVerificar = tk.Button(testInterfazInputFrame, text = "ENTER", bg = "dimgrey", fg = "white",
+        command = lambda  : verificarRespuesta())
+        btnVerificar.pack(fill = "x")
+
+        # btnPista = tk.Button(testInterfazInputFrame, text = "Pista")
+        # btnPista.pack(side = tk.LEFT)
+
+        contadorInput += 1
+
+
+        #print(contadorInput)
+        # lugarRespuesta = random.randint(0, 4)
+        # for i in range(5):
+        #     while True:
+
+        #         numeroRandom = random.randint(0, len(objetosArray)-1)
+        #         #print(numeroRandom)
+        #         if numeroRandom not in numerosGenerados and numeroRandom != randomPregunta:
+        #             numerosGenerados.append(numeroRandom)
+        #             break
+        #     if i == lugarRespuesta:
+        #         opciones.append(objetosArray[randomPregunta][r])
+        #     else:
+        #         opciones.append(objetosArray[numeroRandom][r])
+
+        # numerosGenerados = []
+
+        # anchoBotonArr = []
+
+        # for i in opciones:
+        #     anchoBotonArr.append(len(i))
+
+        # anchoBotonArr.sort()
+        # anchoBoton = anchoBotonArr[-1] + 2
+
+        # if anchoBoton < 20:
+        #     anchoBoton = 20
+
+
+        # opcionBoton1 = tk.Button(testInterfazInputFrame, text = opciones[0], width = anchoBoton, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 25), 
+        # command = lambda : verificarRespuesta(0))
+        # opcionBoton1.pack(pady = 10)
+
+        # opcionBoton2 = tk.Button(testInterfazInputFrame, text = opciones[1], width = anchoBoton, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 25), 
+        # command = lambda : verificarRespuesta(1))
+        # opcionBoton2.pack(pady = 10)
+        # opcionBoton3 = tk.Button(testInterfazInputFrame, text = opciones[2], width = anchoBoton, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 25), 
+        # command = lambda : verificarRespuesta(2))
+        # opcionBoton3.pack(pady = 10)
+        # opcionBoton4 = tk.Button(testInterfazInputFrame, text = opciones[3], width = anchoBoton, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 25), 
+        # command = lambda : verificarRespuesta(3))
+        # opcionBoton4.pack(pady = 10)
+        # opcionBoton5 = tk.Button(testInterfazInputFrame, text = opciones[4], width = anchoBoton, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 25), 
+        # command = lambda : verificarRespuesta(4))
+        # opcionBoton5.pack(pady = 10)
+
+        def verificarRespuesta(e = "<Return>"):
+            global resultadoListaInput, numeroCorrectasInput
+
+            respuestaUsuario = respuestaInput.get()
+            try: 
+                avanceLabelInput.config(text = "{}/{}".format(contadorInput, numPreguntas))
+                list = testInterfazInputFrame.winfo_children()
+                for l in list:
+                    l.destroy()
+                testInterfazInputFrame.destroy()
+                
+                if sim(respuestaUsuario) == sim(respuestaCorrecta):
+                    numeroCorrectasInput = numeroCorrectasInput + 1
+                    resultadoListaInputArray.append(("[O] {} = {}".format(palabraPrincipal, respuestaCorrecta),1, palabraPrincipal, respuestaCorrecta))
+                    resultadoListaInput = resultadoListaInput + "O {0} = {1} \n".format(palabraPrincipal, respuestaCorrecta)
+                    resultadosLabelInput.config(text= resultadoListaInput)
+                    nivelar(nivelPrincipal, tablaActual, 1, idPrincipal)
+                else:
+                    resultadoListaInputArray.append(("[X] {} ≠ {}".format(palabraPrincipal, respuestaUsuario),0,palabraPrincipal, respuestaCorrecta))
+                    resultadoListaInput = resultadoListaInput + "X {0} ≠ {1} -> O {2} = {3} \n".format(palabraPrincipal, respuestaUsuario, palabraPrincipal, respuestaCorrecta)
+                    resultadosLabelInput.config(text= resultadoListaInput)
+                    nivelar(nivelPrincipal, tablaActual, 0, idPrincipal)
+                iniciarTest()
+            except Exception as e: 
+                print(e)
+    # def verificarRespuesta():
+    iniciarTest()
+
+def iniciarTestPreguntas(idVar, numPreguntas, modoPreguntas):
     
     global paginaTest, contador, resultadoLista, numeroCorrectas #numPreguntasGlobal
     print(valorNumPreg.get())
@@ -781,7 +997,7 @@ def mostrarPaginaResultado(porcentaje, resultadoArray, idVar):
 
     precisionLabel = tk.Label(bottonFrame, text = "Precisión: ", bg = colorFondoTest, fg = colorLetraTest, font = ("Arial", 20))
     precisionLabel.pack(side = tk.LEFT)
-    porcentajeLabel = tk.Label(bottonFrame, text = str(porcentaje) + "%", bg = colorFondoTest, fg = colorPorcentaje, font = ("Arial", 20))
+    porcentajeLabel = tk.Label(bottonFrame, text = str(round(porcentaje,1)) + "%", bg = colorFondoTest, fg = colorPorcentaje, font = ("Arial", 20))
     porcentajeLabel.pack(side = tk.LEFT)
     # listaCorrectas = tk.Listbox(resultadoFrame, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial", 20))
     # listaCorrectas.pack()
@@ -800,7 +1016,9 @@ def tachar(texto):
         result = result + c + '\u0336'
     return result
 
-
+def sim(texto):
+    textofinal = texto.lower().strip().replace("á", "a").replace("é", "e").replace("í", "i").replace("ó", "o").replace("ú", "u").replace("ü", "u")
+    return textofinal
 
 def formNuevaLista(listaArray, rechazadosArray = None):
     
@@ -869,7 +1087,7 @@ def destruirResultado(idVar = "", salir = 1):
     if salir == 1:
         paginaInicio.pack(fill = "both", expand = True)
     else:
-        iniciarPag(idVar, valorNumPreg.get(), valorModo.get())
+        iniciarTestPreguntas(idVar, valorNumPreg.get(), valorModo.get())
 
 def destruirInicio():
     list = paginaInicio.winfo_children()
