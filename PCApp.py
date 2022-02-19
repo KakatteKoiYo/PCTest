@@ -718,61 +718,15 @@ def iniciarTestInput(idVar, numPreguntas, modoPreguntas):
 
         respuestaInput.bind("<Return>", lambda e = "<Return>": verificarRespuesta(e))
 
-        btnVerificar = tk.Button(testInterfazInputFrame, text = "ENTER", bg = "dimgrey", fg = "white",
-        command = lambda  : verificarRespuesta())
-        btnVerificar.pack(fill = "x")
+        # btnVerificar = tk.Button(testInterfazInputFrame, text = "ENTER", bg = "dimgrey", fg = "white",
+        # command = lambda  : verificarRespuesta())
+        # btnVerificar.pack(fill = "x")
 
         # btnPista = tk.Button(testInterfazInputFrame, text = "Pista")
         # btnPista.pack(side = tk.LEFT)
 
         contadorInput += 1
 
-
-        #print(contadorInput)
-        # lugarRespuesta = random.randint(0, 4)
-        # for i in range(5):
-        #     while True:
-
-        #         numeroRandom = random.randint(0, len(objetosArray)-1)
-        #         #print(numeroRandom)
-        #         if numeroRandom not in numerosGenerados and numeroRandom != randomPregunta:
-        #             numerosGenerados.append(numeroRandom)
-        #             break
-        #     if i == lugarRespuesta:
-        #         opciones.append(objetosArray[randomPregunta][r])
-        #     else:
-        #         opciones.append(objetosArray[numeroRandom][r])
-
-        # numerosGenerados = []
-
-        # anchoBotonArr = []
-
-        # for i in opciones:
-        #     anchoBotonArr.append(len(i))
-
-        # anchoBotonArr.sort()
-        # anchoBoton = anchoBotonArr[-1] + 2
-
-        # if anchoBoton < 20:
-        #     anchoBoton = 20
-
-
-        # opcionBoton1 = tk.Button(testInterfazInputFrame, text = opciones[0], width = anchoBoton, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 25), 
-        # command = lambda : verificarRespuesta(0))
-        # opcionBoton1.pack(pady = 10)
-
-        # opcionBoton2 = tk.Button(testInterfazInputFrame, text = opciones[1], width = anchoBoton, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 25), 
-        # command = lambda : verificarRespuesta(1))
-        # opcionBoton2.pack(pady = 10)
-        # opcionBoton3 = tk.Button(testInterfazInputFrame, text = opciones[2], width = anchoBoton, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 25), 
-        # command = lambda : verificarRespuesta(2))
-        # opcionBoton3.pack(pady = 10)
-        # opcionBoton4 = tk.Button(testInterfazInputFrame, text = opciones[3], width = anchoBoton, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 25), 
-        # command = lambda : verificarRespuesta(3))
-        # opcionBoton4.pack(pady = 10)
-        # opcionBoton5 = tk.Button(testInterfazInputFrame, text = opciones[4], width = anchoBoton, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 25), 
-        # command = lambda : verificarRespuesta(4))
-        # opcionBoton5.pack(pady = 10)
 
         def verificarRespuesta(e = "<Return>"):
             global resultadoListaInput, numeroCorrectasInput
