@@ -234,7 +234,7 @@ def generarLista():
         print(e)
 
 def pantallaInicio(rechazadosArray = None):
-    global paginaInicio, lista, campoDatos, campoEjemplo, camposFrame, valorNumPreg, valorModo
+    global paginaInicio, lista, campoDatos, campoEjemplo, camposFrame, valorNumPreg, valorModo, valorTipoTest
     # fondoPaginaInicial = "black"
     # "white"  = "white"
     
@@ -415,7 +415,26 @@ Se debe crear la lista con mínimo 10 objetos.
     rdModo3 = tk.Radiobutton(radioModoFrame, text = "Definición", variable = valorModo, font = ("Arial ", 10),
                          value = 2)
     rdModo3.pack(anchor=tk.W)
+
+    radioTestFrame = tk.LabelFrame(paginaInicio)
+    radioTestFrame.place(x = 870, y = 440)
+
+    valorTipoTest = tk.IntVar()
     
+    tipoTestLabel = tk.Label(radioTestFrame, text ="Tipo de respuesta", font = ("Arial ", 10))
+    tipoTestLabel.pack()
+
+    rdtipoTest = tk.Radiobutton(radioTestFrame, text = "Opciones", variable = valorTipoTest, font = ("Arial ", 10), 
+                       value = 1)
+    rdtipoTest.pack(side = tk.LEFT)
+    rdtipoTest.select()
+    
+
+    rdtipoTest2 = tk.Radiobutton(radioTestFrame, text = "Escrita", variable = valorTipoTest, font = ("Arial ", 10),
+                        value = 2)
+    rdtipoTest2.pack(side = tk.LEFT)
+
+
 
 
     iniciarBoton = tk.Button(paginaInicio, text = "Iniciar", width = 15, font = ("Arial ", 20), state = "disabled"
@@ -812,7 +831,6 @@ def iniciarTestPreguntas(idVar, numPreguntas, modoPreguntas):
             p = 1
             r = 0
 
-
         palabraPrincipal = objetosArray[randomPregunta][p]
         nivelPrincipal = int(objetosArray[randomPregunta][4])
         idPrincipal = objetosArray[randomPregunta][5]
@@ -1030,18 +1048,21 @@ def salirLista():
     verListaFrame.destroy()
     paginaInicio.pack(fill = "both", expand = True)
     
-def mostrar():
-    print(lista.curselection())
-
 def destruirResultado(idVar = "", salir = 1):
     list = resultadoFrame.winfo_children()
     for l in list:
         l.destroy()
     resultadoFrame.destroy()
+
+    
     if salir == 1:
         paginaInicio.pack(fill = "both", expand = True)
     else:
-        iniciarTestPreguntas(idVar, valorNumPreg.get(), valorModo.get())
+        if valorTipoTest == 1:
+            iniciarTestPreguntas(idVar, valorNumPreg.get(), valorModo.get())
+        if valorTipoTest == 2:
+            iniciarTestInput(idVar, valorNumPreg.get(), valorModo.get())
+
 
 def destruirInicio():
     list = paginaInicio.winfo_children()
