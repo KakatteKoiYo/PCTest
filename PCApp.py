@@ -15,15 +15,15 @@ window.title("CustomTest App")
 
 
 
-# def resource_path(relative_path):
-#     try:
-#         base_path = sys._MEIPASS
-#     except:
-#         base_path = os.path.abspath(".")
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except:
+        base_path = os.path.abspath(".")
 
-#     return os.path.join(base_path, relative_path)
+    return os.path.join(base_path, relative_path)
 
-# window.iconbitmap(resource_path("testIcon.ico"))
+window.iconbitmap(resource_path("testIcon.ico"))
 
 def conexionBaseDatos():
     if fs.exists("perfil.db"):
@@ -210,9 +210,9 @@ def generarLista():
     listaArray = []
     listaRechazada = []
     try:
-        listaDividida = [x for x in listaCompleta.split("\n") if x]
+        listaDividida = [x.strip() for x in listaCompleta.split("\n") if x]
         listaCompleta = len(listaDividida)
-        print(listaCompleta)
+        #print(listaCompleta)
         for i in listaDividida:
             if i != "" and "=" in i and len(i.split("=")) == 2:
                 listaArray.append(i.split("="))
@@ -233,13 +233,32 @@ def generarLista():
     except Exception as e:
         print(e)
 
-def pantallaInicio(rechazadosArray = None):
-    global paginaInicio, lista, campoDatos, campoEjemplo, camposFrame, valorNumPreg, valorModo, valorTipoTest
+def interfazPrincipal(rechazadosArray = None):
+    global paginaInicio, lista, campoDatos, campoEjemplo, camposFrame, valorNumPreg, valorModo, valorTipoTest, valorTilde, valorMayus
     # fondoPaginaInicial = "black"
     # "white"  = "white"
     
     idArray = []
     nombreArray = []
+
+    def disEn(*args):
+        try:
+            if valorTipoTest.get() == 1:
+                rdTilde.configure(state = "disabled")
+                rdTilde2.configure(state = "disabled")
+                tildeLabel.configure(state = "disabled")
+                rdMayus.configure(state = "disabled")
+                rdMayus2.configure(state = "disabled")
+                mayusLabel.configure(state = "disabled")
+            if valorTipoTest.get() == 2:
+                rdTilde.configure(state = "normal")
+                rdTilde2.configure(state = "normal")
+                tildeLabel.configure(state = "normal")
+                rdMayus.configure(state = "normal")
+                rdMayus2.configure(state = "normal")
+                mayusLabel.configure(state = "normal")
+        except:
+            pass
 
     def focus1(e):
         input2.configure(state = "disabled")
@@ -357,6 +376,11 @@ Se debe crear la lista con mínimo 10 objetos.
         nombreArray.append(nombreLista[1])
         lista.insert(tk.END, nombreLista[1])
 
+    try:
+        lista.select_set(0)
+        lista.activate(0)
+    except:
+        pass
 
     miListaBoton = tk.Button(paginaInicio, text = "Cargar lista seleccionada", width = 32, font = ("Arial ", 15), command = lambda : cargar())
     miListaBoton.place(x = 10, y = 660)
@@ -374,66 +398,103 @@ Se debe crear la lista con mínimo 10 objetos.
     
 
     radioNumFrame = tk.LabelFrame(paginaInicio)
-    radioNumFrame.place(x = 870, y = 500)
+    radioNumFrame.place(x = 1010, y = 400)
 
-    valorPregLabel = tk.Label(radioNumFrame, text = "Cantidad de preguntas", font = ("Arial ", 10))
+    valorPregLabel = tk.Label(radioNumFrame, text = "Cantidad de preguntas", font = ("Arial ", 10),  state = "disabled")
     valorPregLabel.pack()
 
     valorNumPreg = tk.IntVar()
     
-    rdNumPreg = tk.Radiobutton(radioNumFrame, text = "10", variable = valorNumPreg, font = ("Arial ", 10), borderwidth = 10,
+    rdNumPreg = tk.Radiobutton(radioNumFrame, text = "10", variable = valorNumPreg, font = ("Arial ", 10), borderwidth = 10,  state = "disabled",
                         value = 10)
     rdNumPreg.pack(side = tk.LEFT)
     rdNumPreg.select()
 
-    rdNumPreg2 = tk.Radiobutton(radioNumFrame, text = "20", variable = valorNumPreg, font = ("Arial ", 10),
+    rdNumPreg2 = tk.Radiobutton(radioNumFrame, text = "20", variable = valorNumPreg, font = ("Arial ", 10),  state = "disabled",
                         value = 20)
     rdNumPreg2.pack(side = tk.LEFT)
 
-    rdNumPreg3 = tk.Radiobutton(radioNumFrame, text = "30", variable = valorNumPreg, font = ("Arial ", 10),
+    rdNumPreg3 = tk.Radiobutton(radioNumFrame, text = "30", variable = valorNumPreg, font = ("Arial ", 10),  state = "disabled",
                         value = 30)
     rdNumPreg3.pack(side = tk.LEFT)
 
     radioModoFrame = tk.LabelFrame(paginaInicio)
-    radioModoFrame.place(x = 1040, y = 465)
+    radioModoFrame.place(x = 1030, y = 480)
 
     valorModo = tk.IntVar()
     
-    modoLabel = tk.Label(radioModoFrame, text ="Pregunta principal", font = ("Arial ", 10))
+    modoLabel = tk.Label(radioModoFrame, text ="Pregunta principal", font = ("Arial ", 10),  state = "disabled")
     modoLabel.pack()
 
-    rdModo = tk.Radiobutton(radioModoFrame, text = "Ambos", variable = valorModo, font = ("Arial ", 10), 
+    rdModo = tk.Radiobutton(radioModoFrame, text = "Ambos", variable = valorModo, font = ("Arial ", 10),  state = "disabled", 
                        value = 0)
     rdModo.pack(anchor=tk.W)
     rdModo.select()
     
 
-    rdModo2 = tk.Radiobutton(radioModoFrame, text = "Texto", variable = valorModo, font = ("Arial ", 10),
+    rdModo2 = tk.Radiobutton(radioModoFrame, text = "Texto izquierdo", variable = valorModo, font = ("Arial ", 10),  state = "disabled",
                         value = 1)
     rdModo2.pack(anchor=tk.W)
 
-    rdModo3 = tk.Radiobutton(radioModoFrame, text = "Definición", variable = valorModo, font = ("Arial ", 10),
+    rdModo3 = tk.Radiobutton(radioModoFrame, text = "Texto derecho", variable = valorModo, font = ("Arial ", 10),  state = "disabled",
                          value = 2)
     rdModo3.pack(anchor=tk.W)
 
+
+
     radioTestFrame = tk.LabelFrame(paginaInicio)
-    radioTestFrame.place(x = 870, y = 440)
+    radioTestFrame.place(x = 800, y = 410)
 
     valorTipoTest = tk.IntVar()
-    
-    tipoTestLabel = tk.Label(radioTestFrame, text ="Tipo de respuesta", font = ("Arial ", 10))
+    valorTipoTest.trace("w", disEn)
+    tipoTestLabel = tk.Label(radioTestFrame, text ="Tipo de respuesta", font = ("Arial ", 10),  state = "disabled")
     tipoTestLabel.pack()
 
-    rdtipoTest = tk.Radiobutton(radioTestFrame, text = "Opciones", variable = valorTipoTest, font = ("Arial ", 10), 
+    rdtipoTest = tk.Radiobutton(radioTestFrame, text = "Opciones      ", variable = valorTipoTest, font = ("Arial ", 10),  state = "disabled", 
                        value = 1)
     rdtipoTest.pack(side = tk.LEFT)
     rdtipoTest.select()
     
 
-    rdtipoTest2 = tk.Radiobutton(radioTestFrame, text = "Escrita", variable = valorTipoTest, font = ("Arial ", 10),
+    rdtipoTest2 = tk.Radiobutton(radioTestFrame, text = "Escrita      ", variable = valorTipoTest, font = ("Arial ", 10),  state = "disabled",
                         value = 2)
     rdtipoTest2.pack(side = tk.LEFT)
 
+    radioIgnorarTildeFrame = tk.LabelFrame(paginaInicio)
+    radioIgnorarTildeFrame.place(x = 800, y = 480)
+
+    valorTilde = tk.IntVar()
+    
+    tildeLabel = tk.Label(radioIgnorarTildeFrame, text ="Ignorar tildes", font = ("Arial ", 10),  state = "disabled")
+    tildeLabel.pack()
+
+    rdTilde = tk.Radiobutton(radioIgnorarTildeFrame, text = "Sí", variable = valorTilde, font = ("Arial ", 10) ,  state = "disabled",
+                       value = 1)
+    rdTilde.pack(side = tk.LEFT)
+    rdTilde.select()
+    
+
+    rdTilde2 = tk.Radiobutton(radioIgnorarTildeFrame, text = "No", variable = valorTilde, font = ("Arial ", 10) ,  state = "disabled",
+                        value = 0)
+    rdTilde2.pack(side = tk.LEFT)
+
+    radioIgnorarMayusFrame = tk.LabelFrame(paginaInicio)
+    radioIgnorarMayusFrame.place(x = 900, y = 480)
+
+    valorMayus = tk.IntVar()
+    
+    mayusLabel = tk.Label(radioIgnorarMayusFrame, text ="Ignorar mayúsculas", font = ("Arial ", 10),  state = "disabled")
+    mayusLabel.pack()
+
+    rdMayus = tk.Radiobutton(radioIgnorarMayusFrame, text = "Sí", variable = valorMayus, font = ("Arial ", 10) ,  state = "disabled",
+                       value = 1)
+    rdMayus.pack(side = tk.LEFT)
+    rdMayus.select()
+    
+
+    rdMayus2 = tk.Radiobutton(radioIgnorarMayusFrame, text = "No", variable = valorMayus, font = ("Arial ", 10) ,  state = "disabled",
+                        value = 0)
+    rdMayus2.pack(side = tk.LEFT)
 
 
 
@@ -451,21 +512,34 @@ Se debe crear la lista con mínimo 10 objetos.
             campoCargado.config(state = "disabled")
 
             verListaBoton.config(state = "normal", command = lambda x = idVar: verLista(x))
-            iniciarBoton.config(state = "normal", command = lambda x = idVar: iniciarTestInput(x, valorNumPreg.get(), valorModo.get()))#iniciarTestPreguntas(x, valorNumPreg.get(), valorModo.get()))
+            iniciarBoton.config(state = "normal", command = lambda x  = idVar:seleccionTest(idVar))
+            for i in radioNumFrame.winfo_children():
+                i.configure(state = "normal")
+            for i in radioModoFrame.winfo_children():
+                i.configure(state = "normal")
+            for i in radioTestFrame.winfo_children():
+                i.configure(state = "normal")
+
             eliminarListaBoton.config(state = "normal", command = lambda x = idVar: eliminarLista(x, campoCargado.get("1.0",tk.END)) )
         except:
             pass
 
+
+    def seleccionTest(idVar):
+        if valorTipoTest.get() == 1:
+            iniciarTestPreguntas(idVar, valorNumPreg.get(), valorModo.get())
+        if valorTipoTest.get() == 2:
+            iniciarTestInput(idVar, valorNumPreg.get(), valorModo.get())
 
 def eliminarLista(idVar, nombre):
     respuesta = messagebox.askyesno(title = "Atención", message = "¿Seguro que desea eliminar la lista \n'{}'?".format(nombre.strip()))
     if respuesta == True:
         eliminarTabla(obtenerTabla(idVar), idVar)
         destruirInicio()
-        pantallaInicio()
+        interfazPrincipal()
 
 def verLista(idVar, seleccion = None):
-    print(idVar)
+    
     global verListaFrame
     tablaActual = obtenerTabla(idVar)
     paginaInicio.pack_forget()
@@ -531,7 +605,7 @@ def verLista(idVar, seleccion = None):
         btnEnTest.config(state = "normal")
         btnEliminar.config(state = "normal")
         btnEditarDes.config(state = "normal")
-        print(detalleDisponible)
+        #print(detalleDisponible)
         if detalleDisponible == 1:
             btnEnTest.config(text = "Desactivar en test", command = lambda: cambiarDisponible(0))
             
@@ -666,10 +740,18 @@ def verLista(idVar, seleccion = None):
         listaObjetos.selection_set(seleccion)
         listaObjetos.activate(seleccion)
         mostrarDetalles("<<ListboxSelect>>")
+    else:
+        try: 
+            listaObjetos.selection_set(0)
+            listaObjetos.activate(0)
+            mostrarDetalles("<<ListboxSelect>>")
+        except:
+            pass
+
     listaObjetos.focus()
 
 def iniciarTestInput(idVar, numPreguntas, modoPreguntas):
-    global contadorInput, resultadoListaInput, resultadoListaInputArray, numeroCorrectasInput
+    global paginaInputFrame, contadorInput, resultadoListaInput, resultadoListaInputArray, numeroCorrectasInput
     paginaInicio.pack_forget()
     #destruirInicio()
     paginaInputFrame = tk.Frame(window, bg = colorFondoTest)
@@ -697,13 +779,20 @@ def iniciarTestInput(idVar, numPreguntas, modoPreguntas):
 
     def iniciarTest(respuesta = 0):
         global contadorInput
+        contadorPista = 0
+
         if contadorInput == numPreguntas:
             porcentaje = (numeroCorrectasInput/numPreguntas)*100
             mostrarPaginaResultado(porcentaje, resultadoListaInputArray, idVar)
             return
         
        
-        
+        def generarPista():
+            if contadorPista == 0:
+                for i in respuestaCorrecta.strip():
+                    if i.strip() != "":
+                        cantidadArray.append(i)
+                tk.Label(testInterfazInputFrame, text = "{} letras".format(len(cantidadArray))).pack()
         
         testInterfazInputFrame = tk.Frame(paginaInputFrame, bg = colorFondoTest)
         testInterfazInputFrame.pack()
@@ -741,8 +830,8 @@ def iniciarTestInput(idVar, numPreguntas, modoPreguntas):
         # command = lambda  : verificarRespuesta())
         # btnVerificar.pack(fill = "x")
 
-        # btnPista = tk.Button(testInterfazInputFrame, text = "Pista")
-        # btnPista.pack(side = tk.LEFT)
+        btnPista = tk.Button(testInterfazInputFrame, text = "Pista", command = generarPista)
+        btnPista.pack(fill = "x", expand = True)
 
         contadorInput += 1
 
@@ -778,7 +867,7 @@ def iniciarTestInput(idVar, numPreguntas, modoPreguntas):
 def iniciarTestPreguntas(idVar, numPreguntas, modoPreguntas):
     
     global paginaTest, contador, resultadoLista, numeroCorrectas #numPreguntasGlobal
-    print(valorNumPreg.get())
+    #print(valorNumPreg.get())
     #numPreguntasGlobal = numPreguntas
     tablaActual = obtenerTabla(idVar)
     objetosArray = objetosTabla(tablaActual)
@@ -803,7 +892,7 @@ def iniciarTestPreguntas(idVar, numPreguntas, modoPreguntas):
     resultadosLabel.place(x= 20, y = 70)
 
     avanceLabel = tk.Label(paginaTest, text = "{}/{}".format(contador,numPreguntas), bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 20))
-    avanceLabel.place(x = 1050, y = 30)
+    avanceLabel.place(x = 1050, y = 10)
     def iniciarTest(respuesta = 0):
         global contador
         if contador == numPreguntas:
@@ -885,6 +974,7 @@ def iniciarTestPreguntas(idVar, numPreguntas, modoPreguntas):
         command = lambda : verificarRespuesta(4))
         opcionBoton5.pack(pady = 10)
 
+
         def verificarRespuesta(x):
             global resultadoLista, numeroCorrectas
             try: 
@@ -901,6 +991,11 @@ def iniciarTestPreguntas(idVar, numPreguntas, modoPreguntas):
                     resultadosLabel.config(text= resultadoLista)
                     nivelar(nivelPrincipal, tablaActual, 1, idPrincipal)
                 else:
+                    paginaTest.configure(bg = "red")
+                    window.update()
+                    time.sleep(0.050)
+                    paginaTest.configure(bg = colorFondoTest)
+                    window.update()
                     resultadoListaArray.append(("[X] {} ≠ {}".format(palabraPrincipal, tachar(opciones[x])),0,palabraPrincipal, opciones[lugarRespuesta]))
                     resultadoLista = resultadoLista + "X {0} ≠ {1} -> O {2} = {3} \n".format(palabraPrincipal, opciones[x], palabraPrincipal, opciones[lugarRespuesta])
                     resultadosLabel.config(text= resultadoLista)
@@ -913,9 +1008,13 @@ def iniciarTestPreguntas(idVar, numPreguntas, modoPreguntas):
 
 def mostrarPaginaResultado(porcentaje, resultadoArray, idVar):
     global resultadoFrame
-    destruirTestInicio()
     
-    def seleccionRes(e):
+    if valorTipoTest.get() == 1:
+        destruirTestInicio()
+    if valorTipoTest.get() == 2:
+        destruirTestInputInicio()
+    
+    def seleccionRes(e = "<<ListboxSelect>>"):
        objeto = resultadoArray[listaResultadoFinal.curselection()[0]]
        resultadoPalabra1.config(text = objeto[2])
        resultadoPalabra2.config(text = objeto[3])
@@ -952,7 +1051,10 @@ def mostrarPaginaResultado(porcentaje, resultadoArray, idVar):
         #index = index + 1
 
     listaResultadoFinal.bind("<<ListboxSelect>>", seleccionRes)
+    listaResultadoFinal.select_set(0)
+    listaResultadoFinal.activate(0)
 
+    
     
 
     bottonFrame = tk.Frame(resultadoFrame, bg = colorFondoTest)
@@ -973,6 +1075,8 @@ def mostrarPaginaResultado(porcentaje, resultadoArray, idVar):
     porcentajeLabel.pack(side = tk.LEFT)
     # listaCorrectas = tk.Listbox(resultadoFrame, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial", 20))
     # listaCorrectas.pack()
+    listaResultadoFinal.focus()
+    seleccionRes()
 
 def generarNombreTabla():
     try:
@@ -989,7 +1093,15 @@ def tachar(texto):
     return result
 
 def sim(texto):
-    textofinal = texto.lower().strip().replace("á", "a").replace("é", "e").replace("í", "i").replace("ó", "o").replace("ú", "u").replace("ü", "u")
+    if valorMayus.get() == 1 and valorTilde.get() == 1:
+        textofinal = texto.lower().strip().replace("á", "a").replace("é", "e").replace("í", "i").replace("ó", "o").replace("ú", "u").replace("ü", "u")
+    if valorMayus.get() == 1 and valorTilde.get() == 0:
+        textofinal = texto.lower().strip()
+    if valorMayus.get() == 0 and valorTilde.get() == 1:
+        textofinal = texto.strip().replace("á", "a").replace("é", "e").replace("í", "i").replace("ó", "o").replace("ú", "u").replace("ü", "u")
+    if valorMayus.get() == 0 and valorTilde.get() == 0:
+        textofinal = texto.strip()
+    
     return textofinal
 
 def formNuevaLista(listaArray, rechazadosArray = None):
@@ -1007,9 +1119,9 @@ def formNuevaLista(listaArray, rechazadosArray = None):
             ventanaConfirmacion.destroy()
             destruirInicio()
             if rechazadosArray != None:
-                pantallaInicio(rechazadosArray)
+                interfazPrincipal(rechazadosArray)
             else:
-                pantallaInicio()
+                interfazPrincipal()
     
     x = window.winfo_rootx()
     y = window.winfo_rooty()
@@ -1036,10 +1148,13 @@ def formNuevaLista(listaArray, rechazadosArray = None):
     ventanaConfirmacion.grab_set()
 
 def regresar():
-    destruirTestInicio()
+    if valorTipoTest.get() == 1:
+        destruirTestInicio()
+    if valorTipoTest.get() == 2:
+        destruirTestInputInicio()
     paginaInicio.pack(fill = "both", expand = True)
     # 
-    # pantallaInicio()
+    # interfazPrincipal()
 
 def salirLista():
     list = verListaFrame.winfo_children()
@@ -1058,11 +1173,10 @@ def destruirResultado(idVar = "", salir = 1):
     if salir == 1:
         paginaInicio.pack(fill = "both", expand = True)
     else:
-        if valorTipoTest == 1:
+        if valorTipoTest.get() == 1:
             iniciarTestPreguntas(idVar, valorNumPreg.get(), valorModo.get())
-        if valorTipoTest == 2:
+        if valorTipoTest.get() == 2:
             iniciarTestInput(idVar, valorNumPreg.get(), valorModo.get())
-
 
 def destruirInicio():
     list = paginaInicio.winfo_children()
@@ -1075,7 +1189,13 @@ def destruirTestInicio():
     for l in list:
         l.destroy()
     paginaTest.destroy()
-    paginaTest.destroy()
+    
+def destruirTestInputInicio():
+    list = paginaInputFrame.winfo_children()
+    for l in list:
+        l.destroy()
+    paginaInputFrame.destroy()
+    
 
-pantallaInicio()
+interfazPrincipal()
 window.mainloop()
