@@ -15,15 +15,15 @@ window.title("CustomTest App")
 
 
 
-def resource_path(relative_path):
-    try:
-        base_path = sys._MEIPASS
-    except:
-        base_path = os.path.abspath(".")
+# def resource_path(relative_path):
+#     try:
+#         base_path = sys._MEIPASS
+#     except:
+#         base_path = os.path.abspath(".")
 
-    return os.path.join(base_path, relative_path)
+#     return os.path.join(base_path, relative_path)
 
-window.iconbitmap(resource_path("testIcon.ico"))
+# window.iconbitmap(resource_path("testIcon.ico"))
 
 def conexionBaseDatos():
     if fs.exists("perfil.db"):
@@ -778,7 +778,7 @@ def iniciarTestInput(idVar, numPreguntas, modoPreguntas):
     botonInputSalir.place(x = 100,y = 20)
 
     def iniciarTest(respuesta = 0):
-        global contadorInput
+        global contadorInput, contadorPista
         contadorPista = 0
 
         if contadorInput == numPreguntas:
@@ -788,11 +788,34 @@ def iniciarTestInput(idVar, numPreguntas, modoPreguntas):
         
        
         def generarPista():
-            if contadorPista == 0:
-                for i in respuestaCorrecta.strip():
+            global contadorPista
+            cantidadArray = []
+            if contadorPista == 0: 
+                primerLetra = respuestaCorrecta[0]
+                print(respuestaCorrecta)
+                print(primerLetra)
+                tk.Label(testInterfazInputFrame, text = "Empieza con: {}".format(primerLetra), bg = colorFondoTest,
+                    fg = "indigo", font = ("Arial bold", 15)).pack(pady = 20)
+                
+            if contadorPista == 1:
+                for i in respuestaCorrecta:
                     if i.strip() != "":
                         cantidadArray.append(i)
-                tk.Label(testInterfazInputFrame, text = "{} letras".format(len(cantidadArray))).pack()
+                tk.Label(testInterfazInputFrame, text = "{} letras".format(len(cantidadArray)), bg = colorFondoTest,
+                     fg = "indigo", font = ("Arial bold", 15)).pack(pady = 20)
+            if contadorPista == 2:
+                
+                for i in respuestaCorrecta:
+                    if i.strip() == "":
+                        cantidadArray.append(i)
+                numEspacios = len(cantidadArray)
+                varEspacios = "espacio" if numEspacios == 1 else "espacios"
+
+                tk.Label(testInterfazInputFrame, text = "{} {}".format(numEspacios, varEspacios), bg = colorFondoTest,
+                    fg = "indigo", font = ("Arial bold", 15)).pack(pady = 20)
+                btnPista.configure(state = "disabled", cursor = "x_cursor")
+
+            contadorPista += 1
         
         testInterfazInputFrame = tk.Frame(paginaInputFrame, bg = colorFondoTest)
         testInterfazInputFrame.pack()
@@ -812,8 +835,8 @@ def iniciarTestInput(idVar, numPreguntas, modoPreguntas):
             r = 0
 
 
-        palabraPrincipal = objetosArray[randomPregunta][p]
-        respuestaCorrecta = objetosArray[randomPregunta][r]
+        palabraPrincipal = objetosArray[randomPregunta][p].strip()
+        respuestaCorrecta = objetosArray[randomPregunta][r].strip()
         nivelPrincipal = int(objetosArray[randomPregunta][4])
         idPrincipal = objetosArray[randomPregunta][5]
         palabraPrincipalAncho = len(palabraPrincipal)
@@ -830,8 +853,9 @@ def iniciarTestInput(idVar, numPreguntas, modoPreguntas):
         # command = lambda  : verificarRespuesta())
         # btnVerificar.pack(fill = "x")
 
-        btnPista = tk.Button(testInterfazInputFrame, text = "Pista", command = generarPista)
-        btnPista.pack(fill = "x", expand = True)
+        btnPista = tk.Button(testInterfazInputFrame, text = "Pista", command = generarPista,
+         bg = "indigo", fg = "white", width = 62, cursor = "hand2")
+        btnPista.pack()
 
         contadorInput += 1
 
@@ -854,6 +878,7 @@ def iniciarTestInput(idVar, numPreguntas, modoPreguntas):
                     resultadosLabelInput.config(text= resultadoListaInput)
                     nivelar(nivelPrincipal, tablaActual, 1, idPrincipal)
                 else:
+                    flashError(paginaInputFrame)
                     resultadoListaInputArray.append(("[X] {} ≠ {}".format(palabraPrincipal, respuestaUsuario),0,palabraPrincipal, respuestaCorrecta))
                     resultadoListaInput = resultadoListaInput + "X {0} ≠ {1} -> O {2} = {3} \n".format(palabraPrincipal, respuestaUsuario, palabraPrincipal, respuestaCorrecta)
                     resultadosLabelInput.config(text= resultadoListaInput)
@@ -991,11 +1016,7 @@ def iniciarTestPreguntas(idVar, numPreguntas, modoPreguntas):
                     resultadosLabel.config(text= resultadoLista)
                     nivelar(nivelPrincipal, tablaActual, 1, idPrincipal)
                 else:
-                    paginaTest.configure(bg = "red")
-                    window.update()
-                    time.sleep(0.050)
-                    paginaTest.configure(bg = colorFondoTest)
-                    window.update()
+                    flashError(paginaTest)
                     resultadoListaArray.append(("[X] {} ≠ {}".format(palabraPrincipal, tachar(opciones[x])),0,palabraPrincipal, opciones[lugarRespuesta]))
                     resultadoLista = resultadoLista + "X {0} ≠ {1} -> O {2} = {3} \n".format(palabraPrincipal, opciones[x], palabraPrincipal, opciones[lugarRespuesta])
                     resultadosLabel.config(text= resultadoLista)
@@ -1005,6 +1026,13 @@ def iniciarTestPreguntas(idVar, numPreguntas, modoPreguntas):
                 print(e)
     # def verificarRespuesta():
     iniciarTest()
+
+def flashError(frame):
+    frame.configure(bg = "red")
+    window.update()
+    time.sleep(0.040)
+    frame.configure(bg = colorFondoTest)
+    window.update()
 
 def mostrarPaginaResultado(porcentaje, resultadoArray, idVar):
     global resultadoFrame
