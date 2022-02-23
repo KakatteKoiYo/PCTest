@@ -2,7 +2,7 @@ import tkinter as tk
 import sqlite3 as db
 import os.path as fs
 import random, time, os, sys
-from tkinter import messagebox
+from tkinter import messagebox, ttk
 
 colorFondoTest = "black"
 colorLetraTest = "white"
@@ -366,35 +366,44 @@ Se debe crear la lista con mínimo 10 objetos.
     listaLabel = tk.Label(paginaInicio, text = "Seleccionar lista", font = ("Arial ", 20))
     listaLabel.place(x = 10, y = 450)
 
-    lista = tk.Listbox(paginaInicio, width = 60, bg = "lightgray")
-    lista.place(x = 10, y = 500)
+    nombre = tk.StringVar()
+    lista = ttk.Combobox(paginaInicio, textvariable= nombre, state = "readonly", width = 30)
+    
+    lista.place(x = 50, y = 500)
+    
+    # lista = tk.Listbox(paginaInicio, width = 60, bg = "lightgray")
+    # lista.place(x = 10, y = 500)
 
     rows = conexionBaseDatos()
 
     for nombreLista in rows:
         idArray.append(nombreLista[0])
         nombreArray.append(nombreLista[1])
-        lista.insert(tk.END, nombreLista[1])
+        #print(nombreLista[1])
+    lista.configure(values = nombreArray)
+    lista.selection_clear()
+    #nombre.trace("w", lambda : cargar())
+    lista.bind("<<ComboboxSelected>>", lambda e =  "<<ComboboxSelected>>": cargar(e))
+    
+    # try:
+    #     lista.select_set(0)
+    #     lista.activate(0)
+    # except:
+    #     pass
 
-    try:
-        lista.select_set(0)
-        lista.activate(0)
-    except:
-        pass
-
-    miListaBoton = tk.Button(paginaInicio, text = "Cargar lista seleccionada", width = 32, font = ("Arial ", 15), command = lambda : cargar())
-    miListaBoton.place(x = 10, y = 660)
+    # miListaBoton = tk.Button(paginaInicio, text = "Cargar lista seleccionada", width = 32, font = ("Arial ", 15), command = lambda : cargar())
+    # miListaBoton.place(x = 10, y = 660)
 
     labelCargado =tk.Label(paginaInicio, text = "Lista: ")
-    labelCargado.place(x = 400, y = 500)
-    campoCargado = tk.Text(paginaInicio, width = 30, height = 1, state = "disabled", bg = "lightgray")
-    campoCargado.place(x = 450, y = 500)
+    labelCargado.place(x = 10, y = 500)
+    # campoCargado = tk.Text(paginaInicio, width = 30, height = 1, state = "disabled", bg = "lightgray")
+    # campoCargado.place(x = 450, y = 500)
 
     verListaBoton = tk.Button(paginaInicio, text = "Estudiar lista", font = ("Arial ", 10), state = "disabled" )
-    verListaBoton.place(x = 400, y = 550)
+    verListaBoton.place(x = 10, y = 550)
 
     eliminarListaBoton = tk.Button(paginaInicio, text = "Eliminar lista", font = ("Arial ", 10), state = "disabled")
-    eliminarListaBoton.place(x = 500, y = 550)
+    eliminarListaBoton.place(x = 110, y = 550)
     
 
     radioNumFrame = tk.LabelFrame(paginaInicio)
@@ -503,13 +512,17 @@ Se debe crear la lista con mínimo 10 objetos.
     iniciarBoton.place(x = 900, y = 600)
 
 
-    def cargar():
+    def cargar(e):
+        
         try: 
-            idVar = idArray[lista.curselection()[0]]
-            campoCargado.config(state = "normal")
-            campoCargado.delete('1.0',tk.END)
-            campoCargado.insert(tk.END, nombreArray[lista.curselection()[0]])
-            campoCargado.config(state = "disabled")
+            idVar = idArray[lista.current()]
+            window.focus()
+
+            # idVar = idArray[lista.curselection()[0]]
+            # campoCargado.config(state = "normal")
+            # campoCargado.delete('1.0',tk.END)
+            # campoCargado.insert(tk.END, nombreArray[lista.curselection()[0]])
+            # campoCargado.config(state = "disabled")
 
             verListaBoton.config(state = "normal", command = lambda x = idVar: verLista(x))
             iniciarBoton.config(state = "normal", command = lambda x  = idVar:seleccionTest(idVar))
@@ -520,9 +533,9 @@ Se debe crear la lista con mínimo 10 objetos.
             for i in radioTestFrame.winfo_children():
                 i.configure(state = "normal")
 
-            eliminarListaBoton.config(state = "normal", command = lambda x = idVar: eliminarLista(x, campoCargado.get("1.0",tk.END)) )
-        except:
-            pass
+            eliminarListaBoton.config(state = "normal", command = lambda x = idVar: eliminarLista(x, lista.get()) )
+        except Exception as e:
+            print(e)
 
 
     def seleccionTest(idVar):
@@ -645,7 +658,7 @@ def verLista(idVar, seleccion = None):
    
         listaDividida = [x for x in listaCompleta.split("\n") if x]
         listaCompleta = len(listaDividida)
-        print(listaCompleta)
+        #print(listaCompleta)
         for i in listaDividida:
             if i != "" and "=" in i and len(i.split("=")) == 2:
                 listaArray.append(i.split("="))
@@ -768,6 +781,7 @@ def iniciarTestInput(idVar, numPreguntas, modoPreguntas):
 
     avanceLabelInput = tk.Label(paginaInputFrame, text = "{}/{}".format(contadorInput,numPreguntas), bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 20))
     avanceLabelInput.place(x = 1050, y = 30)
+    avanceLabelInput.lift()
 
     resultadosLabelInput = tk.Label(paginaInputFrame, bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 10), justify = "left")
     resultadosLabelInput.place(x= 20, y = 70)
@@ -792,8 +806,8 @@ def iniciarTestInput(idVar, numPreguntas, modoPreguntas):
             cantidadArray = []
             if contadorPista == 0: 
                 primerLetra = respuestaCorrecta[0]
-                print(respuestaCorrecta)
-                print(primerLetra)
+                #print(respuestaCorrecta)
+                #print(primerLetra)
                 tk.Label(testInterfazInputFrame, text = "Empieza con: {}".format(primerLetra), bg = colorFondoTest,
                     fg = "indigo", font = ("Arial bold", 15)).pack(pady = 20)
                 
@@ -859,7 +873,8 @@ def iniciarTestInput(idVar, numPreguntas, modoPreguntas):
 
         contadorInput += 1
 
-
+        avanceLabelInput.lift()
+        botonInputSalir.lift()
         def verificarRespuesta(e = "<Return>"):
             global resultadoListaInput, numeroCorrectasInput
 
@@ -918,6 +933,7 @@ def iniciarTestPreguntas(idVar, numPreguntas, modoPreguntas):
 
     avanceLabel = tk.Label(paginaTest, text = "{}/{}".format(contador,numPreguntas), bg = colorFondoTest, fg = colorLetraTest, font = ("Arial bold", 20))
     avanceLabel.place(x = 1050, y = 10)
+    
     def iniciarTest(respuesta = 0):
         global contador
         if contador == numPreguntas:
@@ -999,7 +1015,8 @@ def iniciarTestPreguntas(idVar, numPreguntas, modoPreguntas):
         command = lambda : verificarRespuesta(4))
         opcionBoton5.pack(pady = 10)
 
-
+        botontest.lift()
+        avanceLabel.lift()
         def verificarRespuesta(x):
             global resultadoLista, numeroCorrectas
             try: 
@@ -1143,7 +1160,7 @@ def formNuevaLista(listaArray, rechazadosArray = None):
         else:
             nombreTabla = generarNombreTabla()
             mensaje = crearListaSQL(nombreTabla, nombreLista, listaArray)
-            print(mensaje)
+            #print(mensaje)
             ventanaConfirmacion.destroy()
             destruirInicio()
             if rechazadosArray != None:
